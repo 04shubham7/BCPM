@@ -195,25 +195,14 @@ export default function Demo() {
     }
 
     return (
-      <div className="relative w-full bg-white rounded-lg border-2 border-purple-400/30 overflow-hidden hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 min-h-[200px]">
-        {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white z-20">
-            <div className="text-center">
-              <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <p className="text-xs text-purple-600 mt-2 font-medium">Loading...</p>
-            </div>
-          </div>
-        )}
+      <div className="relative w-full rounded-lg border-2 border-purple-400/30 overflow-hidden hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 bg-gray-100">
         {imgSrc && (
           <img
             key={imgSrc}
             alt={label}
             src={imgSrc}
             onLoad={(e) => {
-              console.log(`[PlotImage] ${label} loaded successfully`, e.target.naturalWidth, 'x', e.target.naturalHeight)
+              console.log(`[PlotImage] ${label} loaded - setting loading=false`)
               setLoading(false)
             }}
             onError={(e) => {
@@ -221,8 +210,20 @@ export default function Demo() {
               setImgError(true)
               setLoading(false)
             }}
-            className="w-full h-auto block relative z-0"
+            className="w-full h-auto block"
+            style={{ display: 'block', maxWidth: '100%' }}
           />
+        )}
+        {loading && imgSrc && (
+          <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm">
+            <div className="text-center">
+              <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-xs text-purple-600 mt-2 font-medium">Loading...</p>
+            </div>
+          </div>
         )}
         {!loading && !imgError && imgSrc && (
           <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30 z-30">

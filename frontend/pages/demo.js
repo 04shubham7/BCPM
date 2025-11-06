@@ -13,6 +13,7 @@ export default function Demo() {
   const [modelsAvailable, setModelsAvailable] = useState({ sklearn: true, dl: false, stacking: false })
   const [explain, setExplain] = useState(false)
   const [modalOpen, setModalOpen] = useState(false)
+  const [isMounted, setIsMounted] = useState(false)
 
   // Map which plot types are supported for each model
   const plotSupport = {
@@ -41,6 +42,7 @@ export default function Demo() {
   }
 
   useEffect(() => {
+    setIsMounted(true)
     const onKey = (e) => { if (e.key === 'Escape') setModalOpen(false) }
     window.addEventListener('keydown', onKey)
     return () => window.removeEventListener('keydown', onKey)
@@ -207,27 +209,29 @@ export default function Demo() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 p-4 md:p-6">
       {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(15)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-10"
-            animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 15,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            style={{
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-            }}
-          />
-        ))}
-      </div>
+      {isMounted && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(15)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-10"
+              animate={{
+                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 15,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}

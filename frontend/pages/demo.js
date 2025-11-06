@@ -154,17 +154,40 @@ export default function Demo() {
     const [imgSrc, setImgSrc] = useState('')
     const isSupported = plotSupport[model]?.[type] !== false
 
-    // Generate new image URL when model or type changes
+    // Prefer env-configured API base; fallback to localhost:8000
+    const API_BASE = (typeof process !== 'undefined' && process.env?.NEXT_PUBLIC_API_BASE)
+      || 'http://localhost:8000'
+
+    // Generate image by fetching as Blob to avoid any cross-origin/render quirks
     useEffect(() => {
-      if (isSupported) {
-        setLoading(true)
-        setImgError(false)
-        // Add timestamp to prevent caching
-        const url = `http://localhost:8000/plot?type=${type}&model=${model}&t=${Date.now()}`
-        console.log(`[PlotImage] Loading ${label}:`, url)
-        setImgSrc(url)
+      let revokeUrl = undefined
+      let aborted = false
+      const load = async () => {
+        if (!isSupported) return
+        try {
+          setLoading(true)
+          setImgError(false)
+          const url = `${API_BASE}/plot?type=${type}&model=${model}&t=${Date.now()}`
+          console.log(`[PlotImage] Fetching ${label}:`, url)
+          const res = await fetch(url, { cache: 'no-store' })
+          if (!res.ok) throw new Error(`HTTP ${res.status}`)
+          const blob = await res.blob()
+          if (aborted) return
+          const objUrl = URL.createObjectURL(blob)
+          revokeUrl = objUrl
+          setImgSrc(objUrl)
+        } catch (e) {
+          console.error(`[PlotImage] ${label} fetch failed`, e)
+          setImgError(true)
+          setLoading(false)
+        }
       }
-    }, [model, type, isSupported])
+      load()
+      return () => {
+        aborted = true
+        if (revokeUrl) URL.revokeObjectURL(revokeUrl)
+      }
+    }, [API_BASE, model, type, isSupported, label])
 
     if (!isSupported) {
       return (
@@ -201,32 +224,25 @@ export default function Demo() {
             key={imgSrc}
             alt={label}
             src={imgSrc}
-            onLoad={(e) => {
-              console.log(`[PlotImage] ${label} loaded - setting loading=false`)
-              setLoading(false)
-            }}
-            onError={(e) => {
-              console.error(`[PlotImage] ${label} failed to load`, e)
-              setImgError(true)
-              setLoading(false)
-            }}
+            onLoad={() => { console.log(`[PlotImage] ${label} loaded`); setLoading(false) }}
+            onError={(e) => { console.error(`[PlotImage] ${label} failed`, e); setImgError(true); setLoading(false) }}
             className="w-full h-auto block"
             style={{ display: 'block', maxWidth: '100%' }}
           />
         )}
-        {loading && imgSrc && (
+        {loading && (
           <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm">
             <div className="text-center">
               <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 714 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
               </svg>
               <p className="text-xs text-purple-600 mt-2 font-medium">Loading...</p>
             </div>
           </div>
         )}
         {!loading && !imgError && imgSrc && (
-          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30 z-30">
+          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30">
             {label}
           </div>
         )}

@@ -1,0 +1,105 @@
+{
+  "trained_at": "2025-11-06T17:47:15.684057Z",
+  "random_state": 42,
+  "best_params": {
+    "clf": "LogisticRegression(max_iter=1000, random_state=42)",
+    "clf__C": 10.0,
+    "selector__k": 8
+  },
+  "metrics": {
+    "accuracy": 0.9824561403508771,
+    "precision": 1.0,
+    "recall": 0.9523809523809523,
+    "f1": 0.975609756097561,
+    "roc_auc": 0.9986772486772486
+  },
+  "scikit_learn_version": "1.7.2",
+  "per_model_comparison": {
+    "logreg": {
+      "best_params": {
+        "C": 10.0,
+        "max_iter": 1000,
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.9824561403508771,
+        "precision": 1.0,
+        "recall": 0.9523809523809523,
+        "f1": 0.975609756097561,
+        "roc_auc": 0.9986772486772486
+      },
+      "estimator_class": "<class 'sklearn.linear_model._logistic.LogisticRegression'>"
+    },
+    "rf": {
+      "best_params": {
+        "max_depth": 6,
+        "n_estimators": 100,
+        "n_jobs": -1,
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.9649122807017544,
+        "precision": 1.0,
+        "recall": 0.9047619047619048,
+        "f1": 0.95,
+        "roc_auc": 0.9874338624338624
+      },
+      "estimator_class": "<class 'sklearn.ensemble._forest.RandomForestClassifier'>"
+    },
+    "hgb": {
+      "best_params": {
+        "max_depth": null,
+        "max_iter": 100,
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.956140350877193,
+        "precision": 0.9743589743589743,
+        "recall": 0.9047619047619048,
+        "f1": 0.9382716049382716,
+        "roc_auc": 0.9953703703703705
+      },
+      "estimator_class": "<class 'sklearn.ensemble._hist_gradient_boosting.gradient_boosting.HistGradientBoostingClassifier'>"
+    },
+    "xgb": {
+      "best_params": {
+        "learning_rate": 0.01,
+        "max_depth": 6,
+        "n_estimators": 100,
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.956140350877193,
+        "precision": 1.0,
+        "recall": 0.8809523809523809,
+        "f1": 0.9367088607594937,
+        "roc_auc": 0.9914021164021164
+      },
+      "estimator_class": "<class 'xgboost.sklearn.XGBClassifier'>"
+    },
+    "lgb": {
+      "best_params": {
+        "learning_rate": 0.1,
+        "max_depth": 3,
+        "n_estimators": 100,
+        "random_state": 42
+      },
+      "metrics": {
+        "accuracy": 0.956140350877193,
+        "precision": 1.0,
+        "recall": 0.8809523809523809,
+        "f1": 0.9367088607594937,
+        "roc_auc": 0.9943783068783069
+      },
+      "estimator_class": "<class 'lightgbm.sklearn.LGBMClassifier'>"
+    }
+  },
+  "stacking_model_file": "model_pipeline_stacking.joblib",
+  "stacking": {
+    "accuracy": 0.9824561403508771,
+    "precision": 1.0,
+    "recall": 0.9523809523809523,
+    "f1": 0.975609756097561,
+    "roc_auc": 0.9973544973544973
+  }
+}

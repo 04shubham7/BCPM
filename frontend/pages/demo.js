@@ -160,7 +160,9 @@ export default function Demo() {
         setLoading(true)
         setImgError(false)
         // Add timestamp to prevent caching
-        setImgSrc(`http://localhost:8000/plot?type=${type}&model=${model}&t=${Date.now()}`)
+        const url = `http://localhost:8000/plot?type=${type}&model=${model}&t=${Date.now()}`
+        console.log(`[PlotImage] Loading ${label}:`, url)
+        setImgSrc(url)
       }
     }, [model, type, isSupported])
 
@@ -210,18 +212,21 @@ export default function Demo() {
             key={imgSrc}
             alt={label}
             src={imgSrc}
-            onLoad={() => setLoading(false)}
-            onError={() => { 
+            onLoad={(e) => {
+              console.log(`[PlotImage] ${label} loaded successfully`, e.target.naturalWidth, 'x', e.target.naturalHeight)
+              setLoading(false)
+            }}
+            onError={(e) => {
+              console.error(`[PlotImage] ${label} failed to load`, e)
               setImgError(true)
               setLoading(false)
             }}
-            className={`w-full h-auto block transition-opacity duration-300 ${
-              loading ? 'opacity-0' : 'opacity-100'
-            }`}
+            className="w-full h-auto block"
+            style={{ display: loading ? 'none' : 'block' }}
           />
         )}
-        {!loading && !imgError && (
-          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30 z-20">
+        {!loading && !imgError && imgSrc && (
+          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30">
             {label}
           </div>
         )}

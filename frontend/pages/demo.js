@@ -205,97 +205,162 @@ export default function Demo() {
   }
 
   return (
-    <main className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50 to-indigo-50 p-4 md:p-6">
-      <div className="max-w-7xl mx-auto">
+    <main className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 p-4 md:p-6">
+      {/* Animated background particles */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {[...Array(15)].map((_, i) => (
+          <motion.div
+            key={i}
+            className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-10"
+            animate={{
+              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+            }}
+            transition={{
+              duration: Math.random() * 10 + 15,
+              repeat: Infinity,
+              ease: "linear"
+            }}
+            style={{
+              left: Math.random() * 100 + '%',
+              top: Math.random() * 100 + '%',
+            }}
+          />
+        ))}
+      </div>
+
+      <div className="max-w-7xl mx-auto relative z-10">
         {/* Header */}
-        <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4">
-          <div>
-            <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-indigo-600 to-blue-500 bg-clip-text text-transparent">
-              Breast Cancer Predictor
-            </h1>
-            <p className="text-sm text-slate-600 mt-1">ML-powered diagnostic support system</p>
+        <motion.header 
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.5 }}
+          className="flex flex-col md:flex-row items-start md:items-center justify-between mb-6 gap-4"
+        >
+          <div className="flex items-center gap-4">
+            <motion.div 
+              className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/50"
+              animate={{ 
+                boxShadow: [
+                  "0 0 20px rgba(168, 85, 247, 0.5)",
+                  "0 0 40px rgba(236, 72, 153, 0.5)",
+                  "0 0 20px rgba(6, 182, 212, 0.5)",
+                  "0 0 40px rgba(168, 85, 247, 0.5)",
+                ]
+              }}
+              transition={{ duration: 3, repeat: Infinity }}
+            >
+              BC
+            </motion.div>
+            <div>
+              <h1 className="text-3xl md:text-4xl font-bold bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
+                BCPM Demo
+              </h1>
+              <p className="text-sm text-purple-300 mt-1">ML-powered breast cancer prediction system</p>
+            </div>
           </div>
           <nav className="flex gap-3">
-            <a href='/' className="px-4 py-2 rounded-lg text-slate-600 hover:bg-white/60 transition-colors text-sm font-medium">
+            <motion.a 
+              href='/' 
+              className="px-4 py-2 rounded-lg text-white/90 hover:text-white hover:bg-white/10 transition-colors text-sm font-medium backdrop-blur-sm"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Home
-            </a>
-            <a href='/demo' className="px-4 py-2 rounded-lg bg-white/80 text-indigo-600 font-medium shadow-sm text-sm">
+            </motion.a>
+            <motion.a 
+              href='/demo' 
+              className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-500/20 to-cyan-500/20 backdrop-blur-md text-white font-medium shadow-sm text-sm border border-purple-400/30"
+              whileHover={{ scale: 1.05 }}
+              whileTap={{ scale: 0.95 }}
+            >
               Demo
-            </a>
+            </motion.a>
           </nav>
-        </header>
+        </motion.header>
 
         <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
           {/* Input Section */}
           <div className="xl:col-span-2 space-y-6">
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.1 }}
+              className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 shadow-purple-500/20"
+            >
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+                <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2" />
                 </svg>
                 Input Features
               </h2>
-              <p className="text-slate-600 text-sm mb-4">Enter {FEATURE_COUNT} numeric features or paste values below</p>
+              <p className="text-purple-200 text-sm mb-4">Enter {FEATURE_COUNT} numeric features or paste values below</p>
 
               <textarea
                 onBlur={pasteValues}
                 placeholder={`Paste ${FEATURE_COUNT} comma or space-separated values here`}
-                className="w-full h-24 rounded-lg p-4 border-2 border-slate-200 focus:border-indigo-400 focus:ring-4 focus:ring-indigo-100 transition-all outline-none font-mono text-sm resize-none"
+                className="w-full h-24 rounded-lg p-4 border-2 border-purple-400/30 bg-white/5 text-white placeholder-purple-300/50 focus:border-cyan-400 focus:ring-4 focus:ring-cyan-400/20 transition-all outline-none font-mono text-sm resize-none backdrop-blur-sm"
               />
 
-              <div className="flex flex-wrap items-center gap-4 mt-4 p-4 bg-gradient-to-r from-slate-50 to-blue-50 rounded-lg">
+              <div className="flex flex-wrap items-center gap-4 mt-4 p-4 bg-gradient-to-r from-purple-500/10 to-cyan-500/10 rounded-lg border border-purple-400/30 backdrop-blur-sm">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <span className="text-sm font-medium text-slate-700">Model:</span>
+                  <span className="text-sm font-medium text-purple-200">Model:</span>
                   <label className="flex items-center gap-2 cursor-pointer">
-                    <input type='radio' name='model' value='sklearn' checked={modelType === 'sklearn'} onChange={() => setModelType('sklearn')} className="text-indigo-600 focus:ring-indigo-500" />
-                    <span className="text-sm font-medium">Sklearn</span>
+                    <input type='radio' name='model' value='sklearn' checked={modelType === 'sklearn'} onChange={() => setModelType('sklearn')} className="text-purple-500 focus:ring-purple-500" />
+                    <span className="text-sm font-medium text-white">Sklearn</span>
                   </label>
                   <label className={`flex items-center gap-2 ${modelsAvailable.stacking ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'}`}>
-                    <input type='radio' name='model' value='stacking' checked={modelType === 'stacking'} onChange={() => modelsAvailable.stacking && setModelType('stacking')} disabled={!modelsAvailable.stacking} className="text-indigo-600 focus:ring-indigo-500" />
-                    <span className="text-sm font-medium">Stacking</span>
+                    <input type='radio' name='model' value='stacking' checked={modelType === 'stacking'} onChange={() => modelsAvailable.stacking && setModelType('stacking')} disabled={!modelsAvailable.stacking} className="text-purple-500 focus:ring-purple-500" />
+                    <span className="text-sm font-medium text-white">Stacking</span>
                   </label>
                   <label className={`flex items-center gap-2 ${modelsAvailable.dl ? 'cursor-pointer' : 'opacity-40 cursor-not-allowed'}`}>
-                    <input type='radio' name='model' value='dl' checked={modelType === 'dl'} onChange={() => modelsAvailable.dl && setModelType('dl')} disabled={!modelsAvailable.dl} className="text-indigo-600 focus:ring-indigo-500" />
-                    <span className="text-sm font-medium">Deep Learning</span>
+                    <input type='radio' name='model' value='dl' checked={modelType === 'dl'} onChange={() => modelsAvailable.dl && setModelType('dl')} disabled={!modelsAvailable.dl} className="text-purple-500 focus:ring-purple-500" />
+                    <span className="text-sm font-medium text-white">Deep Learning</span>
                   </label>
                 </div>
 
                 <label className="flex items-center gap-2 cursor-pointer ml-auto">
-                  <input type='checkbox' checked={explain} onChange={e => setExplain(e.target.checked)} className="text-indigo-600 focus:ring-indigo-500 rounded" />
-                  <span className="text-sm font-medium">SHAP Explanation</span>
+                  <input type='checkbox' checked={explain} onChange={e => setExplain(e.target.checked)} className="text-purple-500 focus:ring-purple-500 rounded" />
+                  <span className="text-sm font-medium text-white">SHAP Explanation</span>
                 </label>
               </div>
 
               <div className="flex flex-wrap gap-3 mt-6">
-                <button
+                <motion.button
                   onClick={submit}
-                  className="px-6 py-3 rounded-lg bg-gradient-to-r from-indigo-600 to-blue-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-lg bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 text-white font-semibold shadow-lg hover:shadow-xl transition-all flex items-center gap-2"
                 >
                   <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 10V3L4 14h7v7l9-11h-7z" />
                   </svg>
                   Predict
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={() => { setFeatures(Array(FEATURE_COUNT).fill('')); setResult(null); setError('') }}
-                  className="px-6 py-3 rounded-lg border-2 border-slate-300 bg-white hover:bg-slate-50 transition-all font-medium"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-lg border-2 border-purple-400/30 bg-white/5 hover:bg-white/10 text-white backdrop-blur-sm transition-all font-medium"
                 >
                   Reset
-                </button>
-                <button
+                </motion.button>
+                <motion.button
                   onClick={loadSample}
                   disabled={loadingSample}
-                  className="px-6 py-3 rounded-lg border-2 border-dashed border-slate-300 bg-white hover:bg-slate-50 transition-all disabled:opacity-50 font-medium"
+                  whileHover={{ scale: 1.05 }}
+                  whileTap={{ scale: 0.95 }}
+                  className="px-6 py-3 rounded-lg border-2 border-dashed border-purple-400/30 bg-white/5 hover:bg-white/10 text-white backdrop-blur-sm transition-all disabled:opacity-50 font-medium"
                 >
                   {loadingSample ? '⏳ Loading...' : '📋 Load Sample'}
-                </button>
+                </motion.button>
               </div>
 
               {error && (
                 <motion.div
                   initial={{ opacity: 0, y: -10 }}
                   animate={{ opacity: 1, y: 0 }}
-                  className="mt-4 p-4 rounded-lg bg-red-50 border-2 border-red-200 text-red-700 text-sm flex items-start gap-3"
+                  className="mt-4 p-4 rounded-lg bg-red-500/20 border-2 border-red-400/50 text-red-200 text-sm flex items-start gap-3 backdrop-blur-sm"
                 >
                   <svg className="w-5 h-5 flex-shrink-0 mt-0.5" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
@@ -307,7 +372,7 @@ export default function Demo() {
               <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 gap-3 mt-6">
                 {features.map((v, i) => (
                   <div key={i} className="flex flex-col">
-                    <label className="text-xs text-slate-500 mb-1 truncate font-medium" title={featureNames[i] || `Feature ${i + 1}`}>
+                    <label className="text-xs text-purple-300 mb-1 truncate font-medium" title={featureNames[i] || `Feature ${i + 1}`}>
                       {featureNames[i] || `f${i + 1}`}
                     </label>
                     <input
@@ -317,17 +382,22 @@ export default function Demo() {
                       value={v}
                       onChange={e => handleChange(i, e.target.value)}
                       placeholder={`${i + 1}`}
-                      className="p-2 text-sm rounded-md border-2 border-slate-200 focus:border-indigo-400 focus:ring-2 focus:ring-indigo-200 transition-all outline-none"
+                      className="p-2 text-sm rounded-md border-2 border-purple-400/30 bg-white/5 text-white placeholder-purple-300/30 focus:border-cyan-400 focus:ring-2 focus:ring-cyan-400/20 transition-all outline-none backdrop-blur-sm"
                     />
                   </div>
                 ))}
               </div>
-            </div>
+            </motion.div>
 
             {/* Visualization Grid */}
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div 
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.5, delay: 0.2 }}
+              className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 shadow-purple-500/20"
+            >
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+                <svg className="w-6 h-6 text-purple-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z" />
                 </svg>
                 Model Performance Metrics
@@ -338,14 +408,19 @@ export default function Demo() {
                 <PlotImage key={`fi-${modelType}`} type="fi" label="Feature Importance" model={modelType} />
                 <PlotImage key={`pr-${modelType}`} type="pr" label="Precision-Recall" model={modelType} />
               </div>
-            </div>
+            </motion.div>
           </div>
 
           {/* Results Section */}
           <div className="xl:col-span-1">
-            <div className="bg-white/80 backdrop-blur-md rounded-2xl p-6 shadow-xl border border-white/20 sticky top-6">
-              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2">
-                <svg className="w-6 h-6 text-indigo-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <motion.div 
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              transition={{ duration: 0.5, delay: 0.3 }}
+              className="bg-white/10 backdrop-blur-xl rounded-2xl p-6 shadow-2xl border border-white/20 sticky top-6 shadow-purple-500/20"
+            >
+              <h2 className="text-xl font-semibold mb-4 flex items-center gap-2 text-white">
+                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                 </svg>
                 Prediction Result
@@ -353,15 +428,15 @@ export default function Demo() {
 
               {result ? (
                 <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="space-y-4">
-                  <div className="p-5 rounded-xl bg-gradient-to-br from-slate-50 via-white to-slate-50 border-2 border-slate-100">
+                  <div className="p-5 rounded-xl bg-gradient-to-br from-purple-500/20 via-white/10 to-cyan-500/20 border-2 border-purple-400/30 backdrop-blur-sm">
                     <div className="flex justify-between items-center mb-4">
                       <div>
-                        <div className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Model</div>
-                        <div className="font-bold text-slate-900 text-lg">{result.model_type}</div>
+                        <div className="text-xs text-purple-300 uppercase tracking-wide font-semibold">Model</div>
+                        <div className="font-bold text-white text-lg">{result.model_type}</div>
                       </div>
                       <div className="text-right">
-                        <div className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Diagnosis</div>
-                        <div className={`font-bold text-xl ${result.prediction === 1 ? 'text-red-600' : 'text-green-600'}`}>
+                        <div className="text-xs text-purple-300 uppercase tracking-wide font-semibold">Diagnosis</div>
+                        <div className={`font-bold text-xl ${result.prediction === 1 ? 'text-red-400' : 'text-green-400'}`}>
                           {result.prediction === 1 ? '⚠️ Malignant' : '✅ Benign'}
                         </div>
                       </div>
@@ -369,24 +444,24 @@ export default function Demo() {
 
                     <div>
                       <div className="flex justify-between items-center mb-2">
-                        <div className="text-xs text-slate-500 uppercase tracking-wide font-semibold">Confidence</div>
-                        <div className="font-bold text-slate-900 text-lg">{probabilityPercent}%</div>
+                        <div className="text-xs text-purple-300 uppercase tracking-wide font-semibold">Confidence</div>
+                        <div className="font-bold text-white text-lg">{probabilityPercent}%</div>
                       </div>
-                      <div className="h-4 bg-slate-200 rounded-full overflow-hidden shadow-inner">
+                      <div className="h-4 bg-white/10 rounded-full overflow-hidden shadow-inner backdrop-blur-sm">
                         <motion.div
                           initial={{ width: 0 }}
                           animate={{ width: `${probabilityPercent}%` }}
                           transition={{ duration: 0.8, ease: "easeOut" }}
-                          className={`h-full rounded-full ${result.prediction === 1 ? 'bg-gradient-to-r from-red-500 to-red-600' : 'bg-gradient-to-r from-green-500 to-green-600'}`}
+                          className={`h-full rounded-full ${result.prediction === 1 ? 'bg-gradient-to-r from-red-500 to-pink-600' : 'bg-gradient-to-r from-green-400 to-cyan-500'}`}
                         />
                       </div>
-                      <div className="text-xs text-slate-500 mt-2 font-mono">Raw: {result.probability?.toFixed(6)}</div>
+                      <div className="text-xs text-purple-200 mt-2 font-mono">Raw: {result.probability?.toFixed(6)}</div>
                     </div>
                   </div>
 
                   {result.explanation && (
                     <div className="space-y-2">
-                      <div className="text-sm font-semibold text-slate-700 flex items-center gap-2">
+                      <div className="text-sm font-semibold text-purple-300 flex items-center gap-2">
                         <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
                         </svg>
@@ -396,20 +471,20 @@ export default function Demo() {
                         onClick={() => setModalOpen(true)}
                         src={result.explanation}
                         alt='SHAP explanation'
-                        className="w-full rounded-lg border-2 border-slate-200 cursor-zoom-in hover:border-indigo-400 transition-all shadow-md hover:shadow-lg"
+                        className="w-full rounded-lg border-2 border-purple-400/50 cursor-zoom-in hover:border-cyan-400 transition-all shadow-md hover:shadow-lg hover:shadow-cyan-500/50"
                       />
-                      <p className="text-xs text-slate-500 text-center italic">Click to enlarge</p>
+                      <p className="text-xs text-purple-300 text-center italic">Click to enlarge</p>
                     </div>
                   )}
 
                   {result.explanation_error && (
-                    <div className="p-3 rounded-lg bg-amber-50 border-2 border-amber-200 text-amber-800 text-sm">
+                    <div className="p-3 rounded-lg bg-amber-500/20 border-2 border-amber-400/50 text-amber-200 text-sm backdrop-blur-sm">
                       <strong className="font-semibold">Note:</strong> {result.explanation_error}
                     </div>
                   )}
 
                   {result.warning && (
-                    <div className="p-3 rounded-lg bg-blue-50 border-2 border-blue-200 text-blue-800 text-sm flex items-start gap-2">
+                    <div className="p-3 rounded-lg bg-blue-500/20 border-2 border-blue-400/50 text-blue-200 text-sm flex items-start gap-2 backdrop-blur-sm">
                       <svg className="w-4 h-4 mt-0.5 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7-4a1 1 0 11-2 0 1 1 0 012 0zM9 9a1 1 0 000 2v3a1 1 0 001 1h1a1 1 0 100-2v-3a1 1 0 00-1-1H9z" clipRule="evenodd" />
                       </svg>
@@ -418,7 +493,7 @@ export default function Demo() {
                   )}
                 </motion.div>
               ) : (
-                <div className="text-center py-16 text-slate-400">
+                <div className="text-center py-16 text-purple-300/60">
                   <svg className="w-20 h-20 mx-auto mb-4 opacity-40" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                   </svg>
@@ -426,7 +501,7 @@ export default function Demo() {
                   <p className="text-xs mt-2">Load a sample or enter values to get started</p>
                 </div>
               )}
-            </div>
+            </motion.div>
           </div>
         </div>
       </div>
@@ -438,7 +513,7 @@ export default function Demo() {
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4"
+            className="fixed inset-0 z-50 flex items-center justify-center bg-black/90 backdrop-blur-md p-4"
             onClick={() => setModalOpen(false)}
           >
             <motion.div
@@ -450,7 +525,7 @@ export default function Demo() {
             >
               <button
                 onClick={() => setModalOpen(false)}
-                className="absolute -top-12 right-0 text-white hover:text-slate-300 transition-colors flex items-center gap-2 text-sm font-medium"
+                className="absolute -top-12 right-0 text-white hover:text-purple-300 transition-colors flex items-center gap-2 text-sm font-medium"
               >
                 <span>Close</span>
                 <svg className="w-8 h-8" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -460,7 +535,7 @@ export default function Demo() {
               <img
                 src={result.explanation}
                 alt="SHAP explanation enlarged"
-                className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl border-4 border-white/20"
+                className="max-w-full max-h-[85vh] rounded-2xl shadow-2xl border-4 border-purple-500/40"
               />
             </motion.div>
           </motion.div>

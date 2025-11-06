@@ -197,7 +197,7 @@ export default function Demo() {
     return (
       <div className="relative w-full bg-white rounded-lg border-2 border-purple-400/30 overflow-hidden hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/10 backdrop-blur-sm z-10 min-h-[250px]">
+          <div className="flex items-center justify-center p-12 min-h-[250px]">
             <div className="text-center">
               <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
@@ -207,7 +207,7 @@ export default function Demo() {
             </div>
           </div>
         )}
-        {imgSrc && (
+        {imgSrc && !loading && (
           <img
             key={imgSrc}
             alt={label}
@@ -222,7 +222,6 @@ export default function Demo() {
               setLoading(false)
             }}
             className="w-full h-auto block"
-            style={{ display: loading ? 'none' : 'block' }}
           />
         )}
         {!loading && !imgError && imgSrc && (

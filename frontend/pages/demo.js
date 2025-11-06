@@ -333,10 +333,10 @@ export default function Demo() {
                 Model Performance Metrics
               </h2>
               <div className="grid grid-cols-2 gap-4">
-                <PlotImage type="roc" label="ROC Curve" model={modelType} />
-                <PlotImage type="confusion" label="Confusion Matrix" model={modelType} />
-                <PlotImage type="fi" label="Feature Importance" model={modelType} />
-                <PlotImage type="pr" label="Precision-Recall" model={modelType} />
+                <PlotImage key={`roc-${modelType}`} type="roc" label="ROC Curve" model={modelType} />
+                <PlotImage key={`confusion-${modelType}`} type="confusion" label="Confusion Matrix" model={modelType} />
+                <PlotImage key={`fi-${modelType}`} type="fi" label="Feature Importance" model={modelType} />
+                <PlotImage key={`pr-${modelType}`} type="pr" label="Precision-Recall" model={modelType} />
               </div>
             </div>
           </div>

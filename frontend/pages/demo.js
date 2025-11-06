@@ -151,17 +151,25 @@ export default function Demo() {
   const PlotImage = ({ type, label, model }) => {
     const [imgError, setImgError] = useState(false)
     const [loading, setLoading] = useState(true)
+    const [timestamp, setTimestamp] = useState(Date.now())
     const isSupported = plotSupport[model]?.[type] !== false
+
+    // Reset states when model or type changes
+    useEffect(() => {
+      setLoading(true)
+      setImgError(false)
+      setTimestamp(Date.now())
+    }, [model, type])
 
     if (!isSupported) {
       return (
-        <div className="w-full aspect-square rounded-lg border-2 border-dashed border-slate-200 flex items-center justify-center bg-slate-50">
+        <div className="w-full aspect-square rounded-lg border-2 border-dashed border-purple-400/30 flex items-center justify-center bg-white/5 backdrop-blur-sm">
           <div className="text-center p-4">
-            <svg className="w-10 h-10 mx-auto mb-2 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 mx-auto mb-2 text-purple-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
-            <p className="text-xs text-slate-400 font-medium">Not supported</p>
-            <p className="text-xs text-slate-400 mt-1">{model} model</p>
+            <p className="text-xs text-purple-300 font-medium">Not supported</p>
+            <p className="text-xs text-purple-400/70 mt-1">{model} model</p>
           </div>
         </div>
       )
@@ -169,12 +177,13 @@ export default function Demo() {
 
     if (imgError) {
       return (
-        <div className="w-full aspect-square rounded-lg border-2 border-red-100 flex items-center justify-center bg-red-50">
+        <div className="w-full aspect-square rounded-lg border-2 border-red-400/50 flex items-center justify-center bg-red-500/10 backdrop-blur-sm">
           <div className="text-center p-4">
-            <svg className="w-10 h-10 mx-auto mb-2 text-red-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-10 h-10 mx-auto mb-2 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
-            <p className="text-xs text-red-500 font-medium">Failed to load</p>
+            <p className="text-xs text-red-300 font-medium">Failed to load</p>
+            <p className="text-xs text-red-400/70 mt-1">Please try again</p>
           </div>
         </div>
       )
@@ -183,8 +192,8 @@ export default function Demo() {
     return (
       <div className="relative group">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-slate-50 rounded-lg border-2 border-slate-200 animate-pulse">
-            <svg className="w-8 h-8 text-slate-300 animate-spin" fill="none" viewBox="0 0 24 24">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/5 rounded-lg border-2 border-purple-400/30 animate-pulse backdrop-blur-sm">
+            <svg className="w-8 h-8 text-purple-400 animate-spin" fill="none" viewBox="0 0 24 24">
               <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
               <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
             </svg>
@@ -192,13 +201,13 @@ export default function Demo() {
         )}
         <img
           alt={label}
-          src={`http://localhost:8000/plot?type=${type}&model=${model}`}
+          src={`http://localhost:8000/plot?type=${type}&model=${model}&t=${timestamp}`}
           onLoad={() => setLoading(false)}
           onError={() => { setImgError(true); setLoading(false) }}
-          className={`w-full rounded-lg border-2 border-slate-200 transition-all duration-300 ${loading ? 'opacity-0' : 'opacity-100'} hover:border-indigo-300 hover:shadow-md`}
+          className={`w-full rounded-lg border-2 border-purple-400/30 transition-all duration-300 ${loading ? 'opacity-0' : 'opacity-100'} hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20`}
         />
         {!loading && !imgError && (
-          <div className="absolute bottom-2 left-2 bg-black/70 text-white text-xs px-2 py-1 rounded backdrop-blur-sm">
+          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30">
             {label}
           </div>
         )}

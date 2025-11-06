@@ -221,7 +221,7 @@ export default function Demo() {
               setImgError(true)
               setLoading(false)
             }}
-            className={`w-full h-auto block ${loading ? 'invisible' : 'visible'}`}
+            className="w-full h-auto block relative z-0"
           />
         )}
         {!loading && !imgError && imgSrc && (

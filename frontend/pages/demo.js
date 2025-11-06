@@ -145,28 +145,31 @@ export default function Demo() {
     check()
   }, [])
 
-  const probabilityPercent = result && result.probability ? Math.round(result.probability * 100) : 0
+    const probabilityPercent = result && result.probability ? Math.round(result.probability * 100) : 0
 
   // Component to render plot with error handling and loading states
   const PlotImage = ({ type, label, model }) => {
     const [imgError, setImgError] = useState(false)
     const [loading, setLoading] = useState(true)
-    const [timestamp, setTimestamp] = useState(Date.now())
+    const [imgSrc, setImgSrc] = useState('')
     const isSupported = plotSupport[model]?.[type] !== false
 
-    // Reset states when model or type changes
+    // Generate new image URL when model or type changes
     useEffect(() => {
-      setLoading(true)
-      setImgError(false)
-      setTimestamp(Date.now())
-    }, [model, type])
+      if (isSupported) {
+        setLoading(true)
+        setImgError(false)
+        // Add timestamp to prevent caching
+        setImgSrc(`http://localhost:8000/plot?type=${type}&model=${model}&t=${Date.now()}`)
+      }
+    }, [model, type, isSupported])
 
     if (!isSupported) {
       return (
         <div className="w-full aspect-square rounded-lg border-2 border-dashed border-purple-400/30 flex items-center justify-center bg-white/5 backdrop-blur-sm">
           <div className="text-center p-4">
             <svg className="w-10 h-10 mx-auto mb-2 text-purple-400/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 015.636 5.636m12.728 12.728L5.636 5.636" />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18.364 18.364A9 9 0 005.636 5.636m12.728 12.728A9 9 0 715.636 5.636m12.728 12.728L5.636 5.636" />
             </svg>
             <p className="text-xs text-purple-300 font-medium">Not supported</p>
             <p className="text-xs text-purple-400/70 mt-1">{model} model</p>
@@ -183,37 +186,49 @@ export default function Demo() {
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4m0 4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <p className="text-xs text-red-300 font-medium">Failed to load</p>
-            <p className="text-xs text-red-400/70 mt-1">Please try again</p>
+            <p className="text-xs text-red-400/70 mt-1">Click to retry</p>
           </div>
         </div>
       )
     }
 
     return (
-      <div className="relative group">
+      <div className="relative w-full aspect-square">
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/5 rounded-lg border-2 border-purple-400/30 animate-pulse backdrop-blur-sm">
-            <svg className="w-8 h-8 text-purple-400 animate-spin" fill="none" viewBox="0 0 24 24">
-              <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-              <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+          <div className="absolute inset-0 flex items-center justify-center bg-white/5 rounded-lg border-2 border-purple-400/30 backdrop-blur-sm z-10">
+            <div className="text-center">
+              <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
+                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
+                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <p className="text-xs text-purple-300 mt-2">Loading...</p>
+            </div>
           </div>
         )}
-        <img
-          alt={label}
-          src={`http://localhost:8000/plot?type=${type}&model=${model}&t=${timestamp}`}
-          onLoad={() => setLoading(false)}
-          onError={() => { setImgError(true); setLoading(false) }}
-          className={`w-full rounded-lg border-2 border-purple-400/30 transition-all duration-300 ${loading ? 'opacity-0' : 'opacity-100'} hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20`}
-        />
+        {imgSrc && (
+          <img
+            key={imgSrc}
+            alt={label}
+            src={imgSrc}
+            onLoad={() => setLoading(false)}
+            onError={() => { 
+              setImgError(true)
+              setLoading(false)
+            }}
+            className={`absolute inset-0 w-full h-full object-contain rounded-lg border-2 border-purple-400/30 transition-all duration-300 bg-white ${
+              loading ? 'opacity-0' : 'opacity-100'
+            } hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20`}
+          />
+        )}
         {!loading && !imgError && (
-          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30">
+          <div className="absolute bottom-2 left-2 bg-black/80 text-white text-xs px-3 py-1.5 rounded-md backdrop-blur-sm border border-purple-400/30 z-20">
             {label}
           </div>
         )}
       </div>
     )
   }
+
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 p-4 md:p-6">

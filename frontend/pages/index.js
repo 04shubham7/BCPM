@@ -5,8 +5,10 @@ import { useState, useEffect } from 'react'
 export default function Home() {
   const [models, setModels] = useState({ sklearn: false, stacking: false, dl: false })
   const [scrollY, setScrollY] = useState(0)
+  const [isMounted, setIsMounted] = useState(false)
 
   useEffect(() => {
+    setIsMounted(true)
     const handleScroll = () => setScrollY(window.scrollY)
     window.addEventListener('scroll', handleScroll)
     return () => window.removeEventListener('scroll', handleScroll)
@@ -22,27 +24,29 @@ export default function Home() {
   return (
     <div className="min-h-screen font-sans bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 text-white overflow-hidden relative">
       {/* Animated background particles */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(20)].map((_, i) => (
-          <motion.div
-            key={i}
-            className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-20"
-            animate={{
-              x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-              y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-            }}
-            transition={{
-              duration: Math.random() * 10 + 20,
-              repeat: Infinity,
-              ease: "linear"
-            }}
-            style={{
-              left: Math.random() * 100 + '%',
-              top: Math.random() * 100 + '%',
-            }}
-          />
-        ))}
-      </div>
+      {isMounted && (
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          {[...Array(20)].map((_, i) => (
+            <motion.div
+              key={i}
+              className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-20"
+              animate={{
+                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
+                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
+              }}
+              transition={{
+                duration: Math.random() * 10 + 20,
+                repeat: Infinity,
+                ease: "linear"
+              }}
+              style={{
+                left: Math.random() * 100 + '%',
+                top: Math.random() * 100 + '%',
+              }}
+            />
+          ))}
+        </div>
+      )}
 
       {/* Glassmorphic Header */}
       <motion.header 

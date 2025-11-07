@@ -361,12 +361,14 @@ def add_model_comparison(story, styles, meta):
         ]
         data.append(row)
     
-    comp_table = Table(data, colWidths=[1.8*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.9*inch, 0.9*inch])
-    comp_table.setStyle(TableStyle([
+    # Adjust column widths for better visual balance (slightly wider metric columns)
+    comp_table = Table(data, colWidths=[1.9*inch, 1.0*inch, 1.0*inch, 1.0*inch, 1.0*inch, 1.0*inch])
+    style_cmds = [
         ('BACKGROUND', (0, 0), (-1, 0), colors.HexColor('#3b82f6')),
         ('TEXTCOLOR', (0, 0), (-1, 0), colors.white),
-        ('ALIGN', (0, 0), (0, -1), 'LEFT'),
-        ('ALIGN', (1, 0), (-1, -1), 'CENTER'),
+    ('ALIGN', (0, 0), (0, -1), 'LEFT'),  # Model names left aligned
+    ('ALIGN', (1, 0), (-1, 0), 'CENTER'),  # Header row centered
+    ('ALIGN', (1, 1), (-1, -1), 'RIGHT'),  # Metric numbers right aligned for readability
         ('FONTNAME', (0, 0), (-1, 0), 'Helvetica-Bold'),
         ('FONTNAME', (0, 1), (0, -1), 'Helvetica-Bold'),
         ('FONTNAME', (1, 1), (-1, -1), 'Helvetica'),
@@ -374,12 +376,39 @@ def add_model_comparison(story, styles, meta):
         ('FONTSIZE', (0, 1), (-1, -1), 9),
         ('TOPPADDING', (0, 0), (-1, -1), 6),
         ('BOTTOMPADDING', (0, 0), (-1, -1), 6),
-        ('LEFTPADDING', (0, 0), (-1, -1), 6),
-        ('RIGHTPADDING', (0, 0), (-1, -1), 6),
+    ('LEFTPADDING', (0, 0), (-1, -1), 4),
+    ('RIGHTPADDING', (0, 0), (-1, -1), 4),
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-    ]))
+    ]
+    # Highlight best value per metric column (Accuracy..ROC AUC)
+    try:
+        for col in range(1, 6):
+            best_row = None
+            best_val = float('-inf')
+            for row in range(1, len(data)):
+                try:
+                    val = float(data[row][col])
+                except Exception:
+                    # If values are formatted strings, try stripping and casting
+                    try:
+                        val = float(str(data[row][col]).strip())
+                    except Exception:
+                        continue
+                if val > best_val:
+                    best_val = val
+                    best_row = row
+            if best_row is not None:
+                style_cmds += [
+                    ('BACKGROUND', (col, best_row), (col, best_row), colors.HexColor('#ede9fe')),
+                    ('TEXTCOLOR', (col, best_row), (col, best_row), colors.HexColor('#4c1d95')),
+                    ('FONTNAME', (col, best_row), (col, best_row), 'Helvetica-Bold'),
+                ]
+    except Exception:
+        pass
+
+    comp_table.setStyle(TableStyle(style_cmds))
     comp_table.hAlign = 'CENTER'
     story.append(comp_table)
     story.append(Spacer(1, 16))
@@ -586,8 +615,11 @@ def build_pdf():
         try:
             story.append(Paragraph('Workflow Diagram', styles['CustomSubHeading']))
             img = Image(str(workflow_img))
-            img.drawWidth = 5.5 * inch
-            img.drawHeight = 5.5 * inch * (img.imageHeight / float(img.imageWidth))
+            # Clamp image to available frame width to avoid overflow
+            max_w = doc.width - 12  # small inner padding
+            aspect = img.imageHeight / float(img.imageWidth)
+            img.drawWidth = max_w
+            img.drawHeight = max_w * aspect
             img.hAlign = 'CENTER'
             story.append(img)
             story.append(Spacer(1, 14))
@@ -605,53 +637,65 @@ def build_pdf():
     # Generate PDF
     try:
         doc.build(story)
-        print(f'✅ Generated professional PDF report: {OUT}')
-        print(f'📄 File size: {OUT.stat().st_size / 1024:.2f} KB')
-        print(f'📊 Total sections: 10 comprehensive sections')
-        print(f'✨ Report generated with proper alignment and NO blank spaces')
+        # Avoid Unicode symbols that may fail on some Windows terminals (cp1252)
+        print(f'[OK] Generated professional PDF report: {OUT}')
+        print(f'[INFO] File size: {OUT.stat().st_size / 1024:.2f} KB')
+        print(f'[INFO] Total sections: 10 comprehensive sections')
+        print(f'[INFO] Report generated with proper alignment and no blank spaces')
     except Exception as e:
-        print(f'❌ Error generating PDF: {e}')
+        print(f'[ERROR] Error generating PDF: {e}')
         raise
 
 if __name__ == '__main__':
-    # Auto-create a simple workflow diagram PNG if missing
+    # Always (re)generate the workflow diagram PNG to ensure theme updates are visible
     workflow_png = ART / 'workflow.png'
-    if not workflow_png.exists():
-        ART.mkdir(exist_ok=True)
-        if PILImage is not None:
-            # Pillow-based simple flowchart
-            W, H = 1000, 360
-            img = PILImage.new('RGB', (W, H), (255, 255, 255))
-            dr = ImageDraw.Draw(img)
-            def rect(x, y, w, h, text):
-                dr.rounded_rectangle([x, y, x+w, y+h], radius=12, outline=(59,130,246), width=3, fill=(245,247,255))
-                try:
-                    font = ImageFont.truetype("arial.ttf", 18)
-                except Exception:
-                    font = ImageFont.load_default()
-                # Use textbbox for modern Pillow
-                bbox = dr.textbbox((0,0), text, font=font)
-                tw = bbox[2]-bbox[0]
-                th = bbox[3]-bbox[1]
-                dr.text((x + w/2 - tw/2, y + h/2 - th/2), text, fill=(31,41,55), font=font)
-            def arrow(x1, y1, x2, y2):
-                dr.line([x1, y1, x2, y2], fill=(99,102,241), width=3)
-                # simple arrow head
-                ah = 8
-                dr.polygon([(x2, y2), (x2-ah, y2-ah), (x2-ah, y2+ah)], fill=(99,102,241))
-            rect(20, 220, 200, 70, 'Data & Training')
-            rect(240, 220, 180, 70, 'Artifacts')
-            rect(440, 220, 160, 70, 'API')
-            rect(620, 220, 160, 70, 'Frontend')
-            rect(240, 110, 180, 70, 'Reports (PDF)')
-            rect(440, 110, 160, 70, 'Awareness PDF')
-            arrow(220, 255, 240, 255)
-            arrow(420, 255, 440, 255)
-            arrow(600, 255, 620, 255)
-            arrow(330, 220, 330, 180)
-            arrow(520, 220, 520, 180)
-            img.save(str(workflow_png))
-            print(f'Generated workflow diagram (Pillow): {workflow_png}')
-        else:
-            print('Pillow not available; skipping workflow.png generation')
+    ART.mkdir(exist_ok=True)
+    if PILImage is not None:
+        # Pillow-based flowchart (dark purple theme)
+        W, H = 1080, 380
+        img = PILImage.new('RGB', (W, H), (26, 10, 46))
+        dr = ImageDraw.Draw(img)
+        for i in range(H):
+            ratio = i / H
+            r = int(26 + (45-26)*ratio)
+            g = int(10 + (27-10)*ratio)
+            b = int(46 + (75-46)*ratio)
+            dr.line([(0, i), (W, i)], fill=(r, g, b))
+        dr = ImageDraw.Draw(img)
+        def rect(x, y, w, h, text):
+            dr.rounded_rectangle([x, y, x+w, y+h], radius=14, outline=(139,92,246), width=3, fill=(60,35,110))
+            try:
+                font = ImageFont.truetype("arial.ttf", 20)
+            except Exception:
+                font = ImageFont.load_default()
+            bbox = dr.textbbox((0,0), text, font=font)
+            tw = bbox[2]-bbox[0]
+            th = bbox[3]-bbox[1]
+            dr.text((x + w/2 - tw/2, y + h/2 - th/2), text, fill=(230, 223, 255), font=font)
+        def arrow(x1, y1, x2, y2):
+            dr.line([x1, y1, x2, y2], fill=(139,92,246), width=4)
+            ah = 10
+            dr.polygon([(x2, y2), (x2-ah, y2-ah), (x2-ah, y2+ah)], fill=(139,92,246))
+        try:
+            title_font = ImageFont.truetype("arial.ttf", 26)
+        except Exception:
+            title_font = ImageFont.load_default()
+        dr.text((30, 25), 'BreastAI Workflow', fill=(230,223,255), font=title_font)
+        # Flow boxes
+        rect(40, 250, 220, 80, 'Data & Training')
+        rect(300, 250, 200, 80, 'Artifacts')
+        rect(540, 250, 180, 80, 'API')
+        rect(760, 250, 180, 80, 'Frontend')
+        rect(300, 130, 200, 80, 'Reports (PDF)')
+        rect(540, 130, 180, 80, 'Awareness PDF')
+        # Arrows
+        arrow(260, 290, 300, 290)
+        arrow(500, 290, 540, 290)
+        arrow(720, 290, 760, 290)
+        arrow(400, 250, 400, 210)
+        arrow(630, 250, 630, 210)
+        img.save(str(workflow_png))
+        print(f'[OK] Generated workflow diagram (Pillow): {workflow_png}')
+    else:
+        print('[WARN] Pillow not available; skipping workflow.png generation')
     build_pdf()

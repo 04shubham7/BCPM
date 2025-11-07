@@ -79,6 +79,8 @@ Open http://localhost:3000 and try:
    Reports (PDF) <────────────┘          Awareness PDF (cached per lang/day)
 ```
 
+![Project workflow](artifacts/workflow.png)
+
 The same diagram is exported as `artifacts/workflow.png` and embedded into the generated PDF.
 
 - Prediction report: generated on-demand via `/report` (streamed PDF)

@@ -11,10 +11,12 @@ Usage:
 from pathlib import Path
 import numpy as np
 import pandas as pd
+import joblib
 
 ROOT = Path(__file__).resolve().parent
 DATA_PATH = ROOT / "data.csv"
 MODEL_OUT = ROOT / "dl_model.h5"
+SCALER_OUT = ROOT / "dl_scaler.joblib"
 
 def load_and_prepare():
     df = pd.read_csv(DATA_PATH)
@@ -68,6 +70,12 @@ def main():
     X_test = scaler.transform(X_test)
 
     model, history = build_and_train(X_train, y_train, X_test, y_test)
+    # Persist the scaler so inference uses the same preprocessing
+    try:
+        joblib.dump(scaler, SCALER_OUT)
+        print('Saved scaler to', SCALER_OUT)
+    except Exception as e:
+        print('Warning: failed to save scaler:', e)
     print('Saved DL model to', MODEL_OUT)
 
 if __name__ == '__main__':

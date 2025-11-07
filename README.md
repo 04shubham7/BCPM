@@ -1,76 +1,105 @@
-# Breast Cancer Prediction - Training Pipeline
+# BreastAI — Breast Cancer Prediction and Awareness (FastAPI + Next.js)
 
-This small project contains a reproducible training script to build a breast cancer prediction model from `data.csv`.
+BreastAI turns a Jupyter-style experiment into a reproducible pipeline, an API that streams plots and PDFs, and a modern dark-themed web app. It includes a “Getting Started” learning page, awareness PDFs (multi-language), and optional deep learning — all wired end-to-end.
 
-Files added:
-- `train_model.py` — training script: loads `data.csv`, preprocesses data, runs GridSearchCV, evaluates, and saves the best pipeline to `model_pipeline.joblib` and metadata to `model_metadata.json`.
-- `requirements.txt` — minimal dependencies for running the script.
+Highlights
+- Reproducible training (scikit-learn) with stacked models and metadata export
+- FastAPI backend that streams on-demand PDFs (prediction report + awareness guide)
+- Next.js frontend with a dark purple theme, accessible content, and embedded videos
+- Optional TensorFlow deep-learning path with lazy runtime detection
+- Smooth UX: auto-open prediction report, reliable downloads, and print styles
 
-How to run
-1. Create a Python environment (recommended):
+Repository layout (top level)
+- `train_model.py` — Train & export sklearn pipeline and metadata
+- `train_dl.py` — Optional Keras MLP training for tabular data
+- `app/main.py` — FastAPI app (predict, report, awareness, models, sample)
+- `frontend/` — Next.js site (Home, Learn, Demo) with Tailwind styling
+- `generate_pdf.py` — Builds a sample/report PDF for homepage download
+- `artifacts/` — Saved plots (ROC/PR/Confusion/SHAP), classification report
+- `model_pipeline.joblib`, `model_pipeline_stacking.joblib`, `model_metadata.json` — artifacts
+- `dl_model.h5` — optional deep learning model
+- `requirements.txt` — Python deps (ReportLab pinned for reliable PDFs)
 
-   python -m venv .venv
-   .venv\Scripts\Activate.ps1  # PowerShell on Windows
+## Quick start (Windows PowerShell)
 
-2. Install dependencies:
-
-   pip install -r requirements.txt
-
-3. Place `data.csv` in the repository root (same folder as this README). Then run:
-
-   python train_model.py
-
-Outputs
-- `model_pipeline.joblib` — saved sklearn Pipeline (imputer/scaler/selector/classifier). Load this with `joblib.load()` for inference.
-- `model_metadata.json` — training metadata and metrics.
-
-Next steps (FastAPI + Next.js integration)
-- Create a FastAPI service that loads `model_pipeline.joblib` at startup and exposes a `/predict` endpoint that accepts JSON arrays (feature values) and returns predictions and probabilities.
-- Build a Next.js frontend that calls the FastAPI endpoint and shows results in a modern UI.
-
-FastAPI quick start
-
-1. Start the API (from repo root):
-
-   uvicorn app.main:APP --reload --port 8000
-
-2. Health check:
-
-   GET http://127.0.0.1:8000/health
-
-3. Example prediction (JSON body):
-
-   POST http://127.0.0.1:8000/predict
-   Body: {"features": [x1, x2, ..., x30]}
-
-The included `app/main.py` is a minimal FastAPI server that loads the saved pipeline lazily and exposes `/predict` and `/health`.
-
-Deep learning (optional)
-
-If you'd rather train a small deep network instead of the sklearn pipeline, there's an optional `train_dl.py` which trains a Keras MLP on the tabular CSV. TensorFlow is not included by default because it's large; to use it install `tensorflow` (or `tensorflow-cpu`) in your environment and run:
-
-    python train_dl.py
-
-Note: CNNs are most appropriate when your input is images. Since `data.csv` is tabular, a simple MLP is recommended. If you have medical image data later, I can add a CNN training pipeline as well.
-
-Frontend (Next.js) quick example
-
-Here's an example fetch snippet your Next.js frontend can use to call the FastAPI endpoint:
-
-```js
-// pages/api/predict.js (example client-side call)
-async function predict(features) {
-   const res = await fetch('http://localhost:8000/predict', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ features })
-   });
-   return res.json();
-}
+Backend API
+```powershell
+python -m venv .venv
+.venv\Scripts\Activate.ps1
+pip install -r requirements.txt
+python -m uvicorn app.main:APP --reload --port 8000
 ```
 
-I can scaffold a minimal Next.js app (with a form that sends feature values and displays results) if you want — tell me and I'll add it to the repo.
+Frontend (Next.js)
+```powershell
+cd frontend
+npm install
+npm run dev
+```
 
-Notes
-- The training script uses SelectKBest feature selection; you can switch to PCA or keep all features easily by editing `train_model.py`.
-- For deployment, pin versions exactly and consider building a Docker container.
+Open http://localhost:3000 and try:
+- Launch Demo → enter or load sample values → prediction → report auto-opens
+- Getting Started → visual guide with i18n and awareness PDF download
+
+## Project workflow (end-to-end)
+
+1) Data & Training
+- Load `data.csv`; clean columns (drop id/unnamed); stratified split
+- Preprocess: imputer → scaler → SelectKBest (k tuned)
+- Train candidate models; GridSearchCV; export best pipeline and `model_metadata.json`
+- Optional: train a DL MLP; persist `dl_model.h5` and a consistent scaler
+
+2) API (FastAPI)
+- Lazy-load artifacts; detect DL runtime (no heavy TF import at startup)
+- `/predict` validates input and returns prediction and probability
+- `/report` streams a per-prediction PDF with plots and metrics
+- `/awareness` serves a daily-cached multilingual awareness PDF
+- `/models` reports available models and whether DL is runnable
+- `/sample` returns a canonical feature vector for quick demos
+
+3) Frontend (Next.js)
+- Home: feature highlights and an awareness spotlight video
+- Learn: “Getting Started” guide with visuals, FAQs, and PDF download
+- Demo: inputs, model selector (sklearn/stacking/DL), SHAP toggle; opens PDF
+- Smooth scrolling and fade-in animations; downloads via robust proxying
+
+4) Reports & PDFs
+- Prediction report: generated on-demand via `/report` (streamed PDF)
+- Awareness guide: multi-language PDF with inline vector illustrations; cached per day
+- Sample static PDF: built by `generate_pdf.py` for homepage download
+
+## API reference (dev URLs)
+- GET `http://127.0.0.1:8000/health`
+- POST `http://127.0.0.1:8000/predict`  Body: `{ "features": [x1..x30], "model_type": "sklearn|stacking|dl", "explain": bool }`
+- POST `http://127.0.0.1:8000/report`
+- GET `http://127.0.0.1:8000/awareness?lang=en|hi|mr`
+- GET `http://127.0.0.1:8000/models`
+- GET `http://127.0.0.1:8000/sample`
+
+## Deep learning (optional)
+TensorFlow isn’t imported at startup: the backend checks runtime availability and model file presence before enabling the DL option. To enable DL locally:
+```powershell
+pip install tensorflow-cpu
+python train_dl.py
+```
+
+## Generate a sample report PDF
+```powershell
+python generate_pdf.py
+```
+This creates `report.pdf` (the homepage “Download Example Report”). It summarizes metrics, configuration, model comparison, plots, key findings, technical details, and clinical implications. It now also includes a “Project Workflow” section.
+
+## Tests
+```powershell
+python test_report.py
+python -m pytest -q  # if you add more tests
+```
+
+## Troubleshooting
+- Awareness PDF returns 404 in dev: ensure Next.js dev rewrite maps `/api/awareness` → backend `/awareness` and that the API is running on port 8000.
+- Deep learning disabled: check `/models` — DL requires both `dl_model.h5` and a TF runtime.
+- Blank plots in reports: make sure `artifacts/*.png` exist; rebuild by re-running training.
+
+## License and disclaimer
+This repository is for educational purposes. It does not provide medical advice.
+

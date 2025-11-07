@@ -264,7 +264,7 @@ def per_model_search_and_eval(X_train_t, y_train, X_test_t, y_test, artifacts_di
                     plt.legend()
                     plt.tight_layout()
                     (artifacts_dir / f'roc_{name}.png').parent.mkdir(parents=True, exist_ok=True)
-                    plt.savefig(artifacts_dir / f'roc_{name}.png', dpi=150)
+                    plt.savefig(artifacts_dir / f'roc_{name}.png', dpi=300)
                     plt.close()
 
                     precision, recall, _ = precision_recall_curve(y_test, y_prob)
@@ -276,7 +276,7 @@ def per_model_search_and_eval(X_train_t, y_train, X_test_t, y_test, artifacts_di
                     plt.title(f'Precision-Recall - {name}')
                     plt.legend()
                     plt.tight_layout()
-                    plt.savefig(artifacts_dir / f'pr_{name}.png', dpi=150)
+                    plt.savefig(artifacts_dir / f'pr_{name}.png', dpi=300)
                     plt.close()
             except Exception as e:
                 print(f"Warning: failed to save curves for {name}:", e)
@@ -360,7 +360,7 @@ def build_and_eval_stacking(per_model_results, X_train_t, y_train, X_test_t, y_t
                 plt.title('ROC Curve - Stacking')
                 plt.legend()
                 plt.tight_layout()
-                plt.savefig(artifacts_dir / f'roc_stacking.png', dpi=150)
+                plt.savefig(artifacts_dir / f'roc_stacking.png', dpi=300)
                 plt.close()
 
                 precision, recall, _ = precision_recall_curve(y_test, y_prob)
@@ -372,7 +372,7 @@ def build_and_eval_stacking(per_model_results, X_train_t, y_train, X_test_t, y_t
                 plt.title('Precision-Recall - Stacking')
                 plt.legend()
                 plt.tight_layout()
-                plt.savefig(artifacts_dir / f'pr_stacking.png', dpi=150)
+                plt.savefig(artifacts_dir / f'pr_stacking.png', dpi=300)
                 plt.close()
         except Exception as e:
             print('Warning: failed to save stacking curves:', e)
@@ -413,7 +413,7 @@ def evaluate_model(model, X_test, y_test):
         plt.title('Confusion Matrix')
         cm_path = ARTIFACTS / 'confusion_matrix.png'
         plt.tight_layout()
-        plt.savefig(cm_path, dpi=150)
+        plt.savefig(cm_path, dpi=300)
         plt.close()
 
         # ROC curve
@@ -428,7 +428,7 @@ def evaluate_model(model, X_test, y_test):
             plt.legend(loc='lower right')
             roc_path = ARTIFACTS / 'roc_curve.png'
             plt.tight_layout()
-            plt.savefig(roc_path, dpi=150)
+            plt.savefig(roc_path, dpi=300)
             plt.close()
 
             # Precision-Recall curve + average precision
@@ -443,7 +443,7 @@ def evaluate_model(model, X_test, y_test):
                 plt.legend(loc='lower left')
                 pr_path = ARTIFACTS / 'precision_recall_curve.png'
                 plt.tight_layout()
-                plt.savefig(pr_path, dpi=150)
+                plt.savefig(pr_path, dpi=300)
                 plt.close()
             except Exception:
                 pass
@@ -467,7 +467,7 @@ def evaluate_model(model, X_test, y_test):
                 plt.title('Feature importances')
                 fi_path = ARTIFACTS / 'feature_importances.png'
                 plt.tight_layout()
-                plt.savefig(fi_path, dpi=150)
+                plt.savefig(fi_path, dpi=300)
                 plt.close()
         except Exception:
             pass
@@ -544,7 +544,7 @@ def main():
                     shap.summary_plot(shap_values, X_train_trans, show=False)
                     spath = ARTIFACTS / 'shap_summary.png'
                     plt.tight_layout()
-                    plt.savefig(spath, dpi=150)
+                    plt.savefig(spath, dpi=300)
                     plt.close()
 
                     # dependence plot for top feature
@@ -555,7 +555,7 @@ def main():
                         shap.dependence_plot(top_idx, shap_values.values, X_train_trans, show=False)
                         dpath = ARTIFACTS / 'shap_dependence_top.png'
                         plt.tight_layout()
-                        plt.savefig(dpath, dpi=150)
+                        plt.savefig(dpath, dpi=300)
                         plt.close()
                     except Exception:
                         pass

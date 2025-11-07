@@ -1,516 +1,208 @@
+import Head from 'next/head'
 import Link from 'next/link'
-import { motion } from 'framer-motion'
-import { useState, useEffect } from 'react'
+import VideoEmbed from '../components/VideoEmbed'
+import SiteFooter from '../components/SiteFooter'
 
-export default function Home() {
-  const [models, setModels] = useState({ sklearn: false, stacking: false, dl: false })
-  const [scrollY, setScrollY] = useState(0)
-  const [isMounted, setIsMounted] = useState(false)
-
-  useEffect(() => {
-    setIsMounted(true)
-    const handleScroll = () => setScrollY(window.scrollY)
-    window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  }, [])
-
-  useEffect(() => {
-    fetch('http://localhost:8000/models')
-      .then(res => res.json())
-      .then(data => setModels(data))
-      .catch(() => {})
-  }, [])
+export default function Home(){
+  const doShare = async () => {
+    try {
+      const shareUrl = typeof window !== 'undefined' ? window.location.href : 'http://localhost:3000'
+      if (navigator.share) {
+        await navigator.share({
+          title: 'BreastAI — Learn the signs',
+          text: 'Know the signs of breast cancer and spread awareness.',
+          url: shareUrl,
+        })
+      } else if (navigator.clipboard) {
+        await navigator.clipboard.writeText(shareUrl)
+        alert('Link copied!')
+      }
+    } catch (e) { /* user canceled or unsupported */ }
+  }
 
   return (
-    <div className="min-h-screen font-sans bg-gradient-to-br from-purple-900 via-indigo-900 to-cyan-900 text-white overflow-hidden relative">
-      {/* Animated background particles */}
-      {isMounted && (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-          {[...Array(20)].map((_, i) => (
-            <motion.div
-              key={i}
-              className="absolute w-2 h-2 bg-cyan-400 rounded-full opacity-20"
-              animate={{
-                x: [Math.random() * window.innerWidth, Math.random() * window.innerWidth],
-                y: [Math.random() * window.innerHeight, Math.random() * window.innerHeight],
-              }}
-              transition={{
-                duration: Math.random() * 10 + 20,
-                repeat: Infinity,
-                ease: "linear"
-              }}
-              style={{
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-              }}
-            />
-          ))}
-        </div>
-      )}
+    <div className="min-h-screen">
+      <Head>
+        <title>Breast Cancer Predictor — Demo</title>
+        <meta name="description" content="Explainable breast cancer prediction demo — FastAPI + Next.js" />
+        <meta name="theme-color" content="#2d1b4e" />
+      </Head>
 
-      {/* Glassmorphic Header */}
-      <motion.header 
-        initial={{ y: -100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, type: "spring" }}
-        className={`sticky top-0 z-50 transition-all duration-300 ${
-          scrollY > 50 
-            ? 'bg-black/30 backdrop-blur-xl border-b border-white/10 shadow-lg shadow-purple-500/20' 
-            : 'bg-white/5 backdrop-blur-md border-b border-white/5'
-        }`}
-      >
-        <div className="max-w-7xl mx-auto flex items-center justify-between px-6 lg:px-8 py-4">
-          <motion.div 
-            className="flex items-center gap-4"
-            whileHover={{ scale: 1.05 }}
-            transition={{ type: "spring", stiffness: 400 }}
-          >
-            <motion.div 
-              className="w-14 h-14 rounded-2xl bg-gradient-to-br from-purple-500 via-pink-500 to-cyan-500 flex items-center justify-center text-white font-bold text-xl shadow-lg shadow-purple-500/50"
-              animate={{ 
-                boxShadow: [
-                  "0 0 20px rgba(168, 85, 247, 0.5)",
-                  "0 0 40px rgba(236, 72, 153, 0.5)",
-                  "0 0 20px rgba(6, 182, 212, 0.5)",
-                  "0 0 40px rgba(168, 85, 247, 0.5)",
-                ]
-              }}
-              transition={{ duration: 3, repeat: Infinity }}
-            >
-              BC
-            </motion.div>
-            <div>
-              <div className="font-bold text-xl bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                BCPM
+      <header className="flex items-center justify-between px-8 py-6 bg-purple-900/20 backdrop-blur-md border-b border-purple-500/20">
+        <div className="flex items-center gap-4">
+          <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30">
+            BC
+          </div>
+          <div>
+            <div className="font-semibold text-lg text-purple-100">BreastAI</div>
+            <div className="text-sm text-purple-300/70">Diagnosis demo & model studio</div>
+          </div>
+        </div>
+        <nav className="flex items-center gap-4">
+          <Link href='/' className="text-purple-200 hover:text-purple-100 transition-colors">Home</Link>
+          <Link href='/learn' className="text-purple-200 hover:text-purple-100 transition-colors">Getting Started</Link>
+          <Link href='/demo' className="px-4 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/30 hover:shadow-xl transition-all">
+            Try the Demo
+          </Link>
+        </nav>
+      </header>
+
+      <main className="max-w-6xl mx-auto grid lg:grid-cols-[1fr_420px] gap-8 p-6">
+        <section className="py-8">
+          <h1 className="text-5xl font-extrabold leading-tight bg-gradient-to-r from-purple-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
+            A modern, explainable breast cancer prediction demo
+          </h1>
+          <p className="text-purple-200/80 mt-4 text-lg">
+            We converted a notebook into a reproducible training pipeline with model comparison, stacking, and optional deep-learning. Deployable with FastAPI and demoed with this Next.js frontend. Visuals are generated on-demand from the API, no static artifacts required.
+          </p>
+
+          <div className="flex flex-wrap gap-3 mt-6">
+            <Link href='/demo' className="inline-block px-6 py-3 rounded-xl bg-gradient-to-r from-purple-600 to-violet-600 text-white shadow-lg shadow-purple-500/40 hover:shadow-xl transition-all hover:scale-105 font-semibold">
+              Launch Demo
+            </Link>
+            <Link href='/learn' className="inline-block px-6 py-3 rounded-xl border-2 border-purple-500/40 text-purple-200 hover:bg-purple-800/30 transition-all font-semibold">
+              What Is Breast Cancer?
+            </Link>
+            <a href='http://localhost:8000/files/report.pdf' target='_blank' rel='noreferrer' className="inline-block px-6 py-3 rounded-xl border-2 border-purple-500/40 text-purple-200 hover:bg-purple-800/30 transition-all font-semibold">
+              Download Example Report
+            </a>
+          </div>
+
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mt-8">
+            <FeatureCard 
+              title='Production-ready pipeline' 
+              desc='Imputer → Scaler → SelectKBest → candidate models + GridSearchCV + stacking' 
+            />
+            <FeatureCard 
+              title='On-demand plots' 
+              desc='ROC, PR, confusion, feature importances and SHAP are streamed as images' 
+            />
+            <FeatureCard 
+              title='Explainable' 
+              desc='SHAP-based explanations (when available) or local contributions inlined' 
+            />
+          </div>
+
+          <div className="mt-10">
+            <h2 className="text-2xl font-semibold text-purple-100 mb-4">Awareness Spotlight</h2>
+            <VideoEmbed
+              videoId="DcJDOsEF3-g"
+              title="Why Early Detection Matters — Short Overview"
+              accent="emerald"
+            />
+            <p className="text-xs text-purple-300/70 mt-3">Embedded via YouTube privacy-enhanced mode to reduce tracking.</p>
+          </div>
+        </section>
+
+        <aside className="rounded-xl p-6 glass-card shadow-2xl shadow-purple-900/20">
+          <h3 className="text-lg font-semibold text-purple-100 mb-4">Quick Start</h3>
+          <ol className="mt-3 text-purple-200/70 list-decimal list-inside space-y-2 text-sm">
+            <li>Run the training script: <code className="bg-purple-900/40 px-2 py-1 rounded text-purple-200">python train_model.py</code></li>
+            <li>Start the API: <code className="bg-purple-900/40 px-2 py-1 rounded text-purple-200">python -m uvicorn app.main:APP --reload --port 8000</code></li>
+            <li>Open this site and click <strong className="text-purple-100">Launch Demo</strong></li>
+          </ol>
+
+          <div className="mt-6 grid grid-cols-2 gap-2 text-sm">
+            <div className="text-purple-300/70">Model files</div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/model_pipeline.joblib'>pipeline</a></div>
+            <div className="text-purple-300/70">Stacking</div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/model_pipeline_stacking.joblib'>stacking</a></div>
+            <div className="text-purple-300/70">Deep Learning</div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/dl_model.h5'>dl_model.h5</a></div>
+          </div>
+
+          {/* Awareness mini-block to avoid empty space */}
+          <div className="mt-8 pt-6 border-t border-purple-500/20 fade-in-up delay-1">
+            <h4 className="text-purple-100 font-semibold mb-3">Know the signs</h4>
+            <ul className="text-sm text-purple-200/80 space-y-1">
+              <li>🫱 New lump in breast or underarm</li>
+              <li>🎯 Nipple changes or discharge</li>
+              <li>🟣 Skin dimpling, redness, or scaling</li>
+              <li>📏 Any sudden change in size or shape</li>
+            </ul>
+            {/* Tiny stat highlight */}
+            <div className="mt-4" aria-live="polite">
+              <div className="flex items-center justify-between text-xs text-purple-300/80">
+                <span>Early detection saves lives</span>
+                <span aria-hidden="true">85%</span>
               </div>
-              <div className="text-sm text-purple-300">Breast Cancer Prediction Model</div>
+              <div className="h-2 rounded-full bg-purple-900/50 border border-purple-500/30 overflow-hidden mt-1" role="img" aria-label="Estimated survival improves to around 85% with early detection">
+                <div className="h-full bg-gradient-to-r from-purple-500 to-violet-600" style={{width: '85%'}} />
+              </div>
             </div>
-          </motion.div>
-          
-          <nav className="flex items-center gap-6">
-            <Link href='/' className="text-white/90 hover:text-white transition-colors font-medium">
-              Home
-            </Link>
-            <Link href='#features' className="text-white/90 hover:text-white transition-colors font-medium">
-              Features
-            </Link>
-            <Link href='#models' className="text-white/90 hover:text-white transition-colors font-medium">
-              Models
-            </Link>
-            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-              <Link 
-                href='/demo' 
-                className="px-6 py-2.5 rounded-xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 text-white font-semibold shadow-lg shadow-purple-500/50 hover:shadow-xl hover:shadow-pink-500/50 transition-all"
-              >
-                Launch Demo
-              </Link>
-            </motion.div>
-          </nav>
-        </div>
-      </motion.header>
-
-      {/* Hero Section */}
-      <main className="relative">
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20 lg:py-32">
-          <div className="grid lg:grid-cols-2 gap-12 items-center">
-            {/* Left: Text Content */}
-            <div className="space-y-8">
-              <motion.div
-                initial={{ opacity: 0, y: 50 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.2 }}
-              >
-                <motion.span 
-                  className="inline-block px-4 py-2 rounded-full bg-purple-500/20 backdrop-blur-sm border border-purple-400/30 text-purple-300 text-sm font-semibold mb-6"
-                  animate={{ 
-                    boxShadow: [
-                      "0 0 20px rgba(168, 85, 247, 0.3)",
-                      "0 0 30px rgba(168, 85, 247, 0.5)",
-                      "0 0 20px rgba(168, 85, 247, 0.3)",
-                    ]
-                  }}
-                  transition={{ duration: 2, repeat: Infinity }}
-                >
-                  🏥 AI-Powered Medical Diagnostics
-                </motion.span>
-                
-                <h1 className="text-5xl lg:text-7xl font-extrabold leading-tight mb-6">
-                  <span className="bg-gradient-to-r from-purple-400 via-pink-400 to-cyan-400 bg-clip-text text-transparent">
-                    Predict Breast Cancer
-                  </span>
-                  <br />
-                  <span className="text-white">
-                    With ML Precision
-                  </span>
-                </h1>
-                
-                <p className="text-xl text-purple-200 leading-relaxed">
-                  Advanced machine learning system achieving <span className="text-cyan-400 font-bold">98.25% accuracy</span> with 
-                  ensemble stacking, deep learning, and SHAP explainability. Production-ready FastAPI backend with 
-                  modern Next.js frontend.
-                </p>
-              </motion.div>
-
-              <motion.div 
-                className="flex flex-wrap gap-4"
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.8, delay: 0.4 }}
-              >
-                <motion.div whileHover={{ scale: 1.05, y: -5 }} whileTap={{ scale: 0.95 }}>
-                  <Link 
-                    href='/demo' 
-                    className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 text-white font-bold text-lg shadow-2xl shadow-purple-500/50 hover:shadow-pink-500/50 transition-all group"
-                  >
-                    <span>Launch Demo</span>
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-                    </svg>
-                  </Link>
-                </motion.div>
-                
-                <motion.div whileHover={{ scale: 1.05, y: -5 }} whileTap={{ scale: 0.95 }}>
-                  <a 
-                    href='http://localhost:8000/files/report.pdf' 
-                    target='_blank' 
-                    rel='noreferrer' 
-                    className="inline-flex items-center gap-3 px-8 py-4 rounded-2xl bg-white/10 backdrop-blur-md border-2 border-white/20 text-white font-bold text-lg hover:bg-white/20 transition-all group"
-                  >
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                    </svg>
-                    <span>Download Report</span>
-                  </a>
-                </motion.div>
-              </motion.div>
-
-              {/* Stats */}
-              <motion.div 
-                className="grid grid-cols-3 gap-6 pt-8"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                transition={{ duration: 0.8, delay: 0.6 }}
-              >
-                <StatCard number="98.25%" label="Accuracy" />
-                <StatCard number="100%" label="Precision" />
-                <StatCard number="3+" label="Models" />
-              </motion.div>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <Link href='/learn' className="px-3 py-2 rounded-lg border border-purple-500/30 text-purple-100 hover:bg-purple-800/40 text-sm">Learn more</Link>
+              <a href="/api/awareness?lang=en" target="_blank" rel="noreferrer" className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 text-white text-sm shadow shadow-purple-800/40 hover:shadow-purple-700/50">Download guide PDF</a>
+              <button onClick={doShare} className="px-3 py-2 rounded-lg border border-purple-500/30 text-purple-100 hover:bg-purple-800/40 text-sm inline-flex items-center gap-1">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
+                  <circle cx="18" cy="5" r="3"/>
+                  <circle cx="6" cy="12" r="3"/>
+                  <circle cx="18" cy="19" r="3"/>
+                  <path d="M8.59 13.51l6.83 3.98M15.41 6.51L8.59 10.49"/>
+                </svg>
+                Share
+              </button>
             </div>
-
-            {/* Right: Glassmorphic Card with Model Info */}
-            <motion.div
-              initial={{ opacity: 0, x: 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ duration: 0.8, delay: 0.3 }}
-              className="relative"
-            >
-              <motion.div 
-                className="relative rounded-3xl p-8 bg-white/10 backdrop-blur-xl border border-white/20 shadow-2xl shadow-purple-500/20"
-                whileHover={{ scale: 1.02, y: -10 }}
-                transition={{ type: "spring", stiffness: 300 }}
-              >
-                {/* Glow effect */}
-                <div className="absolute inset-0 rounded-3xl bg-gradient-to-br from-purple-500/20 via-pink-500/20 to-cyan-500/20 blur-2xl -z-10"></div>
-                
-                <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-                  Available Models
-                </h3>
-                
-                <div className="space-y-4">
-                  <ModelStatus 
-                    name="Pipeline Model" 
-                    file="model_pipeline.joblib" 
-                    available={models.sklearn}
-                    description="RandomForest with feature selection"
-                  />
-                  <ModelStatus 
-                    name="Stacking Ensemble" 
-                    file="model_pipeline_stacking.joblib" 
-                    available={models.stacking}
-                    description="5 base models + meta-learner"
-                  />
-                  <ModelStatus 
-                    name="Deep Learning" 
-                    file="dl_model.h5" 
-                    available={models.dl}
-                    description="Neural network with TensorFlow"
-                  />
-                </div>
-
-                <div className="mt-8 p-4 rounded-2xl bg-gradient-to-r from-purple-500/10 to-cyan-500/10 border border-purple-400/30">
-                  <h4 className="font-semibold text-purple-300 mb-3">Quick Start</h4>
-                  <ol className="space-y-2 text-sm text-purple-200">
-                    <li className="flex items-start gap-2">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center text-xs font-bold">1</span>
-                      <span>Train: <code className="text-cyan-400 font-mono">python train_model.py</code></span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center text-xs font-bold">2</span>
-                      <span>Start API: <code className="text-cyan-400 font-mono">uvicorn app.main:APP</code></span>
-                    </li>
-                    <li className="flex items-start gap-2">
-                      <span className="flex-shrink-0 w-6 h-6 rounded-full bg-purple-500/30 flex items-center justify-center text-xs font-bold">3</span>
-                      <span>Launch the demo and start predicting!</span>
-                    </li>
-                  </ol>
-                </div>
-              </motion.div>
-            </motion.div>
+            <div className="mt-2 text-xs text-purple-300/60">Educational only — not medical advice.</div>
           </div>
-        </section>
 
-        {/* Features Section */}
-        <section id="features" className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-              Powerful Features
-            </h2>
-            <p className="text-xl text-purple-200">
-              Production-ready ML pipeline with explainability
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
-            <FeatureCard 
-              icon="🎯"
-              title="High Accuracy"
-              description="Achieves 98.25% accuracy with ensemble stacking and perfect precision (100%)"
-              delay={0.1}
-            />
-            <FeatureCard 
-              icon="📊"
-              title="Real-time Visualization"
-              description="ROC curves, confusion matrices, feature importance, and SHAP plots generated on-demand"
-              delay={0.2}
-            />
-            <FeatureCard 
-              icon="🔍"
-              title="SHAP Explainability"
-              description="Understand model decisions with SHAP values and local feature contributions"
-              delay={0.3}
-            />
-            <FeatureCard 
-              icon="⚡"
-              title="Fast API Backend"
-              description="RESTful endpoints with FastAPI for predictions and visualizations"
-              delay={0.4}
-            />
-            <FeatureCard 
-              icon="🎨"
-              title="Modern UI"
-              description="Beautiful Next.js frontend with Tailwind CSS and Framer Motion animations"
-              delay={0.5}
-            />
-            <FeatureCard 
-              icon="🔬"
-              title="Multiple Models"
-              description="Compare sklearn pipeline, stacking ensemble, and deep learning models"
-              delay={0.6}
-            />
-          </div>
-        </section>
-
-        {/* Model Comparison Section */}
-        <section id="models" className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-          <motion.div
-            initial={{ opacity: 0, y: 50 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="text-center mb-16"
-          >
-            <h2 className="text-4xl lg:text-5xl font-bold mb-4 bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-              Model Architecture
-            </h2>
-            <p className="text-xl text-purple-200">
-              Ensemble of 5 base models with stacking meta-learner
-            </p>
-          </motion.div>
-
-          <div className="grid md:grid-cols-2 gap-8">
-            <ModelArchCard 
-              title="Base Models"
-              models={[
-                "Logistic Regression (98.25% acc)",
-                "Random Forest (96.49% acc)",
-                "XGBoost (95.61% acc)",
-                "LightGBM (95.61% acc)",
-                "HistGradientBoosting (95.61% acc)"
-              ]}
-            />
-            <ModelArchCard 
-              title="Ensemble & Deep Learning"
-              models={[
-                "Stacking Ensemble (98.25% acc)",
-                "Neural Network (TensorFlow/Keras)",
-                "Feature Selection (SelectKBest k=8)",
-                "GridSearchCV Optimization"
-              ]}
-            />
-          </div>
-        </section>
-
-        {/* CTA Section */}
-        <section className="max-w-7xl mx-auto px-6 lg:px-8 py-20">
-          <motion.div
-            initial={{ opacity: 0, scale: 0.9 }}
-            whileInView={{ opacity: 1, scale: 1 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.8 }}
-            className="relative rounded-3xl p-12 bg-gradient-to-r from-purple-600/20 via-pink-600/20 to-cyan-600/20 backdrop-blur-xl border border-white/20 text-center overflow-hidden"
-          >
-            <div className="absolute inset-0 bg-gradient-to-r from-purple-500/10 via-pink-500/10 to-cyan-500/10 blur-3xl"></div>
-            
-            <div className="relative z-10">
-              <h2 className="text-4xl lg:text-5xl font-bold mb-6">
-                Ready to Experience AI Diagnosis?
-              </h2>
-              <p className="text-xl text-purple-200 mb-8 max-w-2xl mx-auto">
-                Try our interactive demo with real-time predictions, visualizations, and SHAP explanations
-              </p>
-              
-              <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
-                <Link 
-                  href='/demo'
-                  className="inline-flex items-center gap-3 px-10 py-5 rounded-2xl bg-gradient-to-r from-purple-500 via-pink-500 to-cyan-500 text-white font-bold text-xl shadow-2xl shadow-purple-500/50 hover:shadow-pink-500/50 transition-all"
-                >
-                  <span>Launch Demo Now</span>
-                  <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                  </svg>
-                </Link>
-              </motion.div>
+          {/* How the demo works */}
+          <div className="mt-8 pt-6 border-t border-purple-500/20 fade-in-up delay-2">
+            <h4 className="text-purple-100 font-semibold mb-3">How this demo works</h4>
+            <ol className="text-sm text-purple-200/80 space-y-2 list-decimal list-inside">
+              <li>Enter test values or use a sample on the Demo page.</li>
+              <li>The API standardizes inputs and runs trained models.</li>
+              <li>Results and a printable PDF report are generated on the fly.</li>
+            </ol>
+            <div className="mt-3 grid grid-cols-3 gap-2 text-center">
+              <MiniStat label="Inputs" value="30+"/>
+              <MiniStat label="Models" value="Stacked"/>
+              <MiniStat label="Report" value="PDF"/>
             </div>
-          </motion.div>
-        </section>
+          </div>
+
+          {/* Reduce your risk */}
+          <div className="mt-8 pt-6 border-t border-purple-500/20 fade-in-up delay-3">
+            <h4 className="text-purple-100 font-semibold mb-3">Reduce your risk</h4>
+            <div className="grid grid-cols-2 gap-2 text-sm">
+              <Tag text="🚶 Stay active"/>
+              <Tag text="🥗 Balanced diet"/>
+              <Tag text="🥂 Limit alcohol"/>
+              <Tag text="🚭 Don’t smoke"/>
+            </div>
+            <div className="mt-3 text-xs text-purple-300/70">Talk to a healthcare professional for personalized guidance.</div>
+            <div className="mt-3 text-xs space-x-3">
+              <a className="text-purple-300 hover:text-purple-200 underline" href="https://www.who.int/news-room/fact-sheets/detail/breast-cancer" target="_blank" rel="noreferrer">WHO</a>
+              <a className="text-purple-300 hover:text-purple-200 underline" href="https://www.cancer.gov/types/breast" target="_blank" rel="noreferrer">NCI</a>
+              <a className="text-purple-300 hover:text-purple-200 underline" href="https://www.cdc.gov/cancer/breast/basic_info/index.htm" target="_blank" rel="noreferrer">CDC</a>
+            </div>
+          </div>
+        </aside>
       </main>
 
-      {/* Footer */}
-      <footer className="border-t border-white/10 bg-black/20 backdrop-blur-md py-8">
-        <div className="max-w-7xl mx-auto px-6 lg:px-8">
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4">
-            <div className="text-purple-300 text-sm">
-              © 2025 BCPM - Breast Cancer Prediction Model
-            </div>
-            <div className="flex items-center gap-6 text-sm text-purple-300">
-              <span>Built with FastAPI</span>
-              <span>•</span>
-              <span>Next.js</span>
-              <span>•</span>
-              <span>Scikit-learn</span>
-              <span>•</span>
-              <span>TensorFlow</span>
-            </div>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   )
 }
 
-function StatCard({ number, label }) {
+function FeatureCard({title, desc}){
   return (
-    <motion.div 
-      className="text-center"
-      whileHover={{ scale: 1.1, y: -5 }}
-      transition={{ type: "spring", stiffness: 400 }}
-    >
-      <div className="text-3xl font-bold bg-gradient-to-r from-cyan-400 to-purple-400 bg-clip-text text-transparent">
-        {number}
-      </div>
-      <div className="text-sm text-purple-300 mt-1">{label}</div>
-    </motion.div>
+    <div className="p-5 rounded-xl glass-card border border-purple-500/20 hover:border-purple-400/40 transition-all">
+      <h4 className="font-semibold mb-2 text-purple-100">{title}</h4>
+      <div className="text-sm text-purple-200/70">{desc}</div>
+    </div>
   )
 }
 
-function ModelStatus({ name, file, available, description }) {
+function MiniStat({label, value}){
   return (
-    <motion.div 
-      className="flex items-start gap-3 p-3 rounded-xl bg-white/5 hover:bg-white/10 transition-all group"
-      whileHover={{ x: 5 }}
-    >
-      <div className={`flex-shrink-0 w-10 h-10 rounded-lg flex items-center justify-center ${
-        available 
-          ? 'bg-green-500/20 text-green-400' 
-          : 'bg-red-500/20 text-red-400'
-      }`}>
-        {available ? (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-          </svg>
-        ) : (
-          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-          </svg>
-        )}
-      </div>
-      <div className="flex-1 min-w-0">
-        <div className="font-semibold text-white">{name}</div>
-        <div className="text-xs text-purple-300 truncate">{file}</div>
-        <div className="text-xs text-purple-400 mt-1">{description}</div>
-      </div>
-    </motion.div>
+    <div className="rounded-lg bg-purple-950/40 border border-purple-500/30 py-3 flex flex-col items-center justify-center">
+      <div className="text-xs text-purple-300/70">{label}</div>
+      <div className="text-sm font-semibold text-purple-100 mt-1">{value}</div>
+    </div>
   )
 }
 
-function FeatureCard({ icon, title, description, delay }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, y: 50 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6, delay }}
-      whileHover={{ scale: 1.05, y: -10 }}
-      className="relative group"
-    >
-      <div className="relative p-6 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 hover:bg-white/15 transition-all h-full">
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-500/0 via-pink-500/0 to-cyan-500/0 group-hover:from-purple-500/10 group-hover:via-pink-500/10 group-hover:to-cyan-500/10 transition-all"></div>
-        
-        <div className="relative z-10">
-          <div className="text-4xl mb-4">{icon}</div>
-          <h3 className="text-xl font-bold mb-2 text-white">{title}</h3>
-          <p className="text-purple-200 text-sm leading-relaxed">{description}</p>
-        </div>
-      </div>
-    </motion.div>
-  )
-}
-
-function ModelArchCard({ title, models }) {
-  return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9 }}
-      whileInView={{ opacity: 1, scale: 1 }}
-      viewport={{ once: true }}
-      transition={{ duration: 0.6 }}
-      className="p-8 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20"
-    >
-      <h3 className="text-2xl font-bold mb-6 bg-gradient-to-r from-purple-400 to-cyan-400 bg-clip-text text-transparent">
-        {title}
-      </h3>
-      <ul className="space-y-3">
-        {models.map((model, idx) => (
-          <motion.li 
-            key={idx}
-            initial={{ opacity: 0, x: -20 }}
-            whileInView={{ opacity: 1, x: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.4, delay: idx * 0.1 }}
-            className="flex items-center gap-3 text-purple-200"
-          >
-            <svg className="w-5 h-5 text-cyan-400 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span>{model}</span>
-          </motion.li>
-        ))}
-      </ul>
-    </motion.div>
-  )
+function Tag({text}){
+  return <div className="px-2.5 py-1 rounded-md bg-purple-900/40 border border-purple-500/30 text-purple-100 text-xs">{text}</div>
 }

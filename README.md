@@ -64,6 +64,23 @@ Open http://localhost:3000 and try:
 - Smooth scrolling and fade-in animations; downloads via robust proxying
 
 4) Reports & PDFs
+### ASCII Workflow Diagram
+
+```
+┌───────────────┐      ┌──────────────┐      ┌────────┐      ┌──────────┐
+│  Data & Train │ ───▶ │  Artifacts   │ ───▶ │  API    │ ───▶ │ Frontend │
+│ (train_model) │      │ (models,     │      │ (predict│      │ (Home /  │
+│               │      │  metadata,   │      │  report │      │  Demo /  │
+│  train_dl opt)│      │  plots)      │      │  aware) │      │  Learn)  │
+└──────┬────────┘      └──────┬───────┘      └────┬───┘      └─────┬────┘
+	   │                      │                  │               │
+	   │                      │                  │               │
+	   ▼                      ▼                  ▼               ▼
+   Reports (PDF) <────────────┘          Awareness PDF (cached per lang/day)
+```
+
+The same diagram is exported as `artifacts/workflow.png` and embedded into the generated PDF.
+
 - Prediction report: generated on-demand via `/report` (streamed PDF)
 - Awareness guide: multi-language PDF with inline vector illustrations; cached per day
 - Sample static PDF: built by `generate_pdf.py` for homepage download

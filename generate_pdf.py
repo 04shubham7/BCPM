@@ -3,7 +3,7 @@ Create a professional, well-formatted PDF report from training artifacts.
 This script reads `model_metadata.json` and images saved under `artifacts/` and produces `report.pdf`.
 Enhanced with beautiful styling, proper alignment, comprehensive sections, and NO blank spaces.
 """
-from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Image, 
+from reportlab.platypus import (SimpleDocTemplate, Paragraph, Spacer, Image,
                                 PageBreak, Table, TableStyle, KeepTogether)
 from reportlab.lib.styles import getSampleStyleSheet, ParagraphStyle
 from reportlab.lib.pagesizes import letter
@@ -12,6 +12,8 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from pathlib import Path
 import json
+from reportlab.graphics import renderPM
+from reportlab.graphics.shapes import Drawing, Rect, String, Line
 from datetime import datetime
 
 ROOT = Path(__file__).resolve().parent
@@ -255,7 +257,9 @@ def add_model_performance_summary(story, styles, meta):
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     
+    table.hAlign = 'CENTER'
     story.append(table)
+    story.append(Spacer(1, 12))
 
 def add_model_configuration(story, styles, meta):
     """Add model configuration in compact table format"""
@@ -305,7 +309,9 @@ def add_model_configuration(story, styles, meta):
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
     ]))
     
+    config_table.hAlign = 'CENTER'
     story.append(config_table)
+    story.append(Spacer(1, 12))
 
 def add_model_comparison(story, styles, meta):
     """Add detailed model comparison table"""
@@ -370,13 +376,10 @@ def add_model_comparison(story, styles, meta):
         ('GRID', (0, 0), (-1, -1), 0.5, colors.HexColor('#cbd5e1')),
         ('ROWBACKGROUNDS', (0, 1), (-1, -1), [colors.white, colors.HexColor('#f9fafb')]),
         ('VALIGN', (0, 0), (-1, -1), 'MIDDLE'),
-        # Highlight best model (last row - stacking)
-        ('BACKGROUND', (0, -1), (-1, -1), colors.HexColor('#e0f2fe')),
-        ('TEXTCOLOR', (0, -1), (-1, -1), colors.HexColor('#0369a1')),
-        ('FONTNAME', (0, -1), (-1, -1), 'Helvetica-Bold'),
     ]))
-    
+    comp_table.hAlign = 'CENTER'
     story.append(comp_table)
+    story.append(Spacer(1, 16))
 
 def add_visualizations(story, styles):
     """Add visualization sections with descriptions - compact, no blank spaces"""
@@ -429,6 +432,7 @@ def add_visualizations(story, styles):
                 img.drawHeight = img_height
                 img.hAlign = 'CENTER'
                 story.append(img)
+                story.append(Spacer(1, 12))
             except Exception as e:
                 story.append(Paragraph(f'Error loading image: {e}', styles['CustomBody']))
 
@@ -448,6 +452,7 @@ def add_key_findings(story, styles, meta):
     
     for finding in findings:
         story.append(Paragraph(f'• {finding}', styles['CustomBullet']))
+    story.append(Spacer(1, 10))
 
 def add_technical_details(story, styles):
     """Add technical implementation details"""
@@ -479,6 +484,7 @@ def add_technical_details(story, styles):
         story.append(Paragraph(section_title, styles['CustomSubHeading']))
         for item in items:
             story.append(Paragraph(f'• {item}', styles['CustomBullet']))
+    story.append(Spacer(1, 12))
 
 def add_clinical_implications(story, styles):
     """Add clinical implications section"""
@@ -503,6 +509,7 @@ def add_clinical_implications(story, styles):
     
     for benefit in benefits:
         story.append(Paragraph(f'• {benefit}', styles['CustomBullet']))
+    story.append(Spacer(1, 12))
 
 def add_conclusion(story, styles):
     """Add conclusion section"""
@@ -570,6 +577,19 @@ def build_pdf():
     add_header(story, styles)
     add_executive_summary(story, styles, meta)
     add_project_workflow(story, styles)
+    # Embed workflow diagram image if present
+    workflow_img = ART / 'workflow.png'
+    if workflow_img.exists():
+        try:
+            story.append(Paragraph('Workflow Diagram', styles['CustomSubHeading']))
+            img = Image(str(workflow_img))
+            img.drawWidth = 5.5 * inch
+            img.drawHeight = 5.5 * inch * (img.imageHeight / float(img.imageWidth))
+            img.hAlign = 'CENTER'
+            story.append(img)
+            story.append(Spacer(1, 14))
+        except Exception as e:
+            story.append(Paragraph(f'Error loading workflow diagram: {e}', styles['CustomBody']))
     add_model_performance_summary(story, styles, meta)
     add_model_configuration(story, styles, meta)
     add_model_comparison(story, styles, meta)
@@ -591,4 +611,31 @@ def build_pdf():
         raise
 
 if __name__ == '__main__':
+    # Auto-create a simple workflow diagram PNG if missing
+    workflow_png = ART / 'workflow.png'
+    if not workflow_png.exists():
+        ART.mkdir(exist_ok=True)
+        d = Drawing(600, 260)
+        # Boxes
+        boxes = [
+            (10, 180, 140, 60, 'Data & Training'),
+            (170, 180, 140, 60, 'Artifacts'),
+            (330, 180, 140, 60, 'API'),
+            (490, 180, 100, 60, 'Frontend'),
+            (170, 80, 140, 60, 'Reports'),
+            (330, 80, 140, 60, 'Awareness PDF'),
+        ]
+        for x, y, w, h, label in boxes:
+            d.add(Rect(x, y, w, h, strokeColor=colors.HexColor('#3b82f6'), fillColor=colors.whitesmoke, strokeWidth=1.2))
+            d.add(String(x + w/2, y + h/2, label, textAnchor='middle', fontSize=11, fillColor=colors.HexColor('#1f2937')))
+        # Arrows
+        def arrow(x1, y1, x2, y2):
+            d.add(Line(x1, y1, x2, y2, strokeColor=colors.HexColor('#6366f1'), strokeWidth=1.4))
+        arrow(150, 210, 170, 210)  # Data->Artifacts
+        arrow(310, 210, 330, 210)  # Artifacts->API
+        arrow(470, 210, 490, 210)  # API->Frontend
+        arrow(240, 180, 240, 140)  # Artifacts->Reports
+        arrow(400, 180, 400, 140)  # API->Awareness
+        renderPM.drawToFile(d, str(workflow_png), fmt='PNG')
+        print(f'Generated workflow diagram: {workflow_png}')
     build_pdf()

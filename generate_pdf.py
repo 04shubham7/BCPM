@@ -146,6 +146,37 @@ def add_executive_summary(story, styles, meta):
     )
     story.append(Paragraph(summary_text, styles['CustomBody']))
 
+def add_project_workflow(story, styles):
+    """Add project workflow section to the PDF."""
+    story.append(Paragraph('Project Workflow (End-to-End)', styles['CustomHeading']))
+
+    steps = [
+        ('1) Data & Training', [
+            'Load data.csv; clean identifiers and unnamed columns',
+            'Imputer → StandardScaler → SelectKBest (k tuned)',
+            'GridSearchCV across candidate models; export metadata and plots',
+            'Optional: train a Keras MLP and persist dl_model.h5'
+        ]),
+        ('2) API (FastAPI)', [
+            'Lazy-load artifacts and detect DL runtime (no heavy import on startup)',
+            'POST /predict for predictions; POST /report streams per-prediction PDF',
+            'GET /awareness serves multilingual, daily-cached awareness PDF'
+        ]),
+        ('3) Frontend (Next.js)', [
+            'Home with spotlight video, Learn page with i18n, Demo for predictions',
+            'Auto-open prediction report; reliable PDF downloads via proxy'
+        ]),
+        ('4) Reports & PDFs', [
+            'Prediction report includes ROC/PR/Confusion and key metrics',
+            'Awareness guide uses inline vector illustrations; cached per day'
+        ]),
+    ]
+
+    for title, items in steps:
+        story.append(Paragraph(title, styles['CustomSubHeading']))
+        for it in items:
+            story.append(Paragraph(f'• {it}', styles['CustomBullet']))
+
 def format_metric_value(key, value):
     """Format metric values properly"""
     if isinstance(value, float):
@@ -538,6 +569,7 @@ def build_pdf():
     # Build report sections in order
     add_header(story, styles)
     add_executive_summary(story, styles, meta)
+    add_project_workflow(story, styles)
     add_model_performance_summary(story, styles, meta)
     add_model_configuration(story, styles, meta)
     add_model_comparison(story, styles, meta)

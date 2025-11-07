@@ -12,7 +12,10 @@ from reportlab.lib import colors
 from reportlab.lib.enums import TA_CENTER, TA_JUSTIFY, TA_LEFT, TA_RIGHT
 from pathlib import Path
 import json
-from reportlab.graphics import renderPM
+try:
+    from PIL import Image as PILImage, ImageDraw, ImageFont
+except Exception:  # pillow optional
+    PILImage = None
 from reportlab.graphics.shapes import Drawing, Rect, String, Line
 from datetime import datetime
 
@@ -615,27 +618,38 @@ if __name__ == '__main__':
     workflow_png = ART / 'workflow.png'
     if not workflow_png.exists():
         ART.mkdir(exist_ok=True)
-        d = Drawing(600, 260)
-        # Boxes
-        boxes = [
-            (10, 180, 140, 60, 'Data & Training'),
-            (170, 180, 140, 60, 'Artifacts'),
-            (330, 180, 140, 60, 'API'),
-            (490, 180, 100, 60, 'Frontend'),
-            (170, 80, 140, 60, 'Reports'),
-            (330, 80, 140, 60, 'Awareness PDF'),
-        ]
-        for x, y, w, h, label in boxes:
-            d.add(Rect(x, y, w, h, strokeColor=colors.HexColor('#3b82f6'), fillColor=colors.whitesmoke, strokeWidth=1.2))
-            d.add(String(x + w/2, y + h/2, label, textAnchor='middle', fontSize=11, fillColor=colors.HexColor('#1f2937')))
-        # Arrows
-        def arrow(x1, y1, x2, y2):
-            d.add(Line(x1, y1, x2, y2, strokeColor=colors.HexColor('#6366f1'), strokeWidth=1.4))
-        arrow(150, 210, 170, 210)  # Data->Artifacts
-        arrow(310, 210, 330, 210)  # Artifacts->API
-        arrow(470, 210, 490, 210)  # API->Frontend
-        arrow(240, 180, 240, 140)  # Artifacts->Reports
-        arrow(400, 180, 400, 140)  # API->Awareness
-        renderPM.drawToFile(d, str(workflow_png), fmt='PNG')
-        print(f'Generated workflow diagram: {workflow_png}')
+        if PILImage is not None:
+            # Pillow-based simple flowchart
+            W, H = 1000, 360
+            img = PILImage.new('RGB', (W, H), (255, 255, 255))
+            dr = ImageDraw.Draw(img)
+            def rect(x, y, w, h, text):
+                dr.rounded_rectangle([x, y, x+w, y+h], radius=12, outline=(59,130,246), width=3, fill=(245,247,255))
+                # Text centering
+                try:
+                    font = ImageFont.truetype("arial.ttf", 18)
+                except Exception:
+                    font = ImageFont.load_default()
+                tw, th = dr.textsize(text, font=font)
+                dr.text((x + w/2 - tw/2, y + h/2 - th/2), text, fill=(31,41,55), font=font)
+            def arrow(x1, y1, x2, y2):
+                dr.line([x1, y1, x2, y2], fill=(99,102,241), width=3)
+                # simple arrow head
+                ah = 8
+                dr.polygon([(x2, y2), (x2-ah, y2-ah), (x2-ah, y2+ah)], fill=(99,102,241))
+            rect(20, 220, 200, 70, 'Data & Training')
+            rect(240, 220, 180, 70, 'Artifacts')
+            rect(440, 220, 160, 70, 'API')
+            rect(620, 220, 160, 70, 'Frontend')
+            rect(240, 110, 180, 70, 'Reports (PDF)')
+            rect(440, 110, 160, 70, 'Awareness PDF')
+            arrow(220, 255, 240, 255)
+            arrow(420, 255, 440, 255)
+            arrow(600, 255, 620, 255)
+            arrow(330, 220, 330, 180)
+            arrow(520, 220, 520, 180)
+            img.save(str(workflow_png))
+            print(f'Generated workflow diagram (Pillow): {workflow_png}')
+        else:
+            print('Pillow not available; skipping workflow.png generation')
     build_pdf()

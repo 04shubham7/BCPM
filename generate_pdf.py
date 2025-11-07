@@ -625,12 +625,14 @@ if __name__ == '__main__':
             dr = ImageDraw.Draw(img)
             def rect(x, y, w, h, text):
                 dr.rounded_rectangle([x, y, x+w, y+h], radius=12, outline=(59,130,246), width=3, fill=(245,247,255))
-                # Text centering
                 try:
                     font = ImageFont.truetype("arial.ttf", 18)
                 except Exception:
                     font = ImageFont.load_default()
-                tw, th = dr.textsize(text, font=font)
+                # Use textbbox for modern Pillow
+                bbox = dr.textbbox((0,0), text, font=font)
+                tw = bbox[2]-bbox[0]
+                th = bbox[3]-bbox[1]
                 dr.text((x + w/2 - tw/2, y + h/2 - th/2), text, fill=(31,41,55), font=font)
             def arrow(x1, y1, x2, y2):
                 dr.line([x1, y1, x2, y2], fill=(99,102,241), width=3)

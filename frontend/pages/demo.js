@@ -187,7 +187,7 @@ export default function Demo() {
         aborted = true
         if (revokeUrl) URL.revokeObjectURL(revokeUrl)
       }
-    }, [API_BASE, model, type, isSupported, label])
+    }, [model, type, isSupported])
 
     if (!isSupported) {
       return (
@@ -218,7 +218,7 @@ export default function Demo() {
     }
 
     return (
-      <div className="relative w-full rounded-lg border-2 border-purple-400/30 overflow-hidden hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 bg-gray-100">
+      <div className="relative w-full h-64 md:h-72 rounded-lg border-2 border-purple-400/30 overflow-hidden hover:border-cyan-400 hover:shadow-lg hover:shadow-cyan-500/20 transition-all duration-300 bg-white">
         {imgSrc && (
           <img
             key={imgSrc}
@@ -226,12 +226,11 @@ export default function Demo() {
             src={imgSrc}
             onLoad={() => { console.log(`[PlotImage] ${label} loaded`); setLoading(false) }}
             onError={(e) => { console.error(`[PlotImage] ${label} failed`, e); setImgError(true); setLoading(false) }}
-            className="w-full h-auto block"
-            style={{ display: 'block', maxWidth: '100%' }}
+            className="w-full h-full object-contain block"
           />
         )}
         {loading && (
-          <div className="absolute inset-0 flex items-center justify-center bg-white/95 backdrop-blur-sm">
+          <div className="absolute inset-0 flex items-center justify-center bg-white/90 backdrop-blur-sm">
             <div className="text-center">
               <svg className="w-8 h-8 text-purple-400 animate-spin mx-auto" fill="none" viewBox="0 0 24 24">
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>

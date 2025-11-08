@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { useState } from 'react'
 import VideoEmbed from '../components/VideoEmbed'
 import SiteFooter from '../components/SiteFooter'
+import { apiUrl } from '../lib/api'
 
 export default function Learn(){
   const [lang, setLang] = useState('en')
@@ -315,12 +316,11 @@ function LanguageToggle({lang, setLang}){
 function DownloadAwarenessButton({lang}){
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState(null)
-  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '/api'
   const doDownload = async () => {
     setError(null)
     setLoading(true)
     try {
-      const res = await fetch(`${API_BASE}/awareness?lang=${lang}`)
+      const res = await fetch(apiUrl(`awareness?lang=${lang}`))
       if(!res.ok){
         throw new Error(`Download failed (${res.status})`)
       }

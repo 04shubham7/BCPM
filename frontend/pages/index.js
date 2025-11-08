@@ -2,6 +2,7 @@ import Head from 'next/head'
 import Link from 'next/link'
 import VideoEmbed from '../components/VideoEmbed'
 import SiteFooter from '../components/SiteFooter'
+import { apiUrl } from '../lib/api'
 
 export default function Home(){
   const doShare = async () => {
@@ -63,7 +64,7 @@ export default function Home(){
             <Link href='/learn' className="inline-block px-6 py-3 rounded-xl border-2 border-purple-500/40 text-purple-200 hover:bg-purple-800/30 transition-all font-semibold">
               What Is Breast Cancer?
             </Link>
-            <a href='http://localhost:8000/files/report.pdf' target='_blank' rel='noreferrer' className="inline-block px-6 py-3 rounded-xl border-2 border-purple-500/40 text-purple-200 hover:bg-purple-800/30 transition-all font-semibold">
+            <a href={apiUrl('files/report.pdf')} target='_blank' rel='noreferrer' className="inline-block px-6 py-3 rounded-xl border-2 border-purple-500/40 text-purple-200 hover:bg-purple-800/30 transition-all font-semibold">
               Download Example Report
             </a>
           </div>
@@ -104,11 +105,11 @@ export default function Home(){
 
           <div className="mt-6 grid grid-cols-2 gap-2 text-sm">
             <div className="text-purple-300/70">Model files</div>
-            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/model_pipeline.joblib'>pipeline</a></div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href={apiUrl('files/model_pipeline.joblib')}>pipeline</a></div>
             <div className="text-purple-300/70">Stacking</div>
-            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/model_pipeline_stacking.joblib'>stacking</a></div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href={apiUrl('files/model_pipeline_stacking.joblib')}>stacking</a></div>
             <div className="text-purple-300/70">Deep Learning</div>
-            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href='/files/dl_model.h5'>dl_model.h5</a></div>
+            <div className="text-right"><a className="text-purple-400 hover:text-purple-300 transition-colors" href={apiUrl('files/dl_model.h5')}>dl_model.h5</a></div>
           </div>
 
           {/* Awareness mini-block to avoid empty space */}
@@ -132,7 +133,7 @@ export default function Home(){
             </div>
             <div className="mt-4 flex flex-wrap gap-2">
               <Link href='/learn' className="px-3 py-2 rounded-lg border border-purple-500/30 text-purple-100 hover:bg-purple-800/40 text-sm">Learn more</Link>
-              <a href="/api/awareness?lang=en" target="_blank" rel="noreferrer" className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 text-white text-sm shadow shadow-purple-800/40 hover:shadow-purple-700/50">Download guide PDF</a>
+              <a href={apiUrl('awareness?lang=en')} target="_blank" rel="noreferrer" className="px-3 py-2 rounded-lg bg-gradient-to-r from-purple-600 to-violet-600 text-white text-sm shadow shadow-purple-800/40 hover:shadow-purple-700/50">Download guide PDF</a>
               <button onClick={doShare} className="px-3 py-2 rounded-lg border border-purple-500/30 text-purple-100 hover:bg-purple-800/40 text-sm inline-flex items-center gap-1">
                 <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" aria-hidden="true">
                   <circle cx="18" cy="5" r="3"/>

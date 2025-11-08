@@ -1,4 +1,5 @@
 import Link from 'next/link'
+import { apiUrl } from '../lib/api'
 
 export default function SiteFooter(){
   return (
@@ -19,7 +20,7 @@ export default function SiteFooter(){
           <ul className="space-y-2 text-sm">
             <li><Link className="text-purple-300 hover:text-purple-200" href="/demo">Demo</Link></li>
             <li><Link className="text-purple-300 hover:text-purple-200" href="/learn">Getting Started</Link></li>
-            <li><a className="text-purple-300 hover:text-purple-200" href={(process.env.NEXT_PUBLIC_API_BASE || '') + '/awareness?lang=en'} target="_blank" rel="noreferrer">Awareness PDF</a></li>
+            <li><a className="text-purple-300 hover:text-purple-200" href={apiUrl('awareness?lang=en')} target="_blank" rel="noreferrer">Awareness PDF</a></li>
             <li><a className="text-purple-300 hover:text-purple-200" href="/files/model_pipeline.joblib">Model pipeline</a></li>
           </ul>
         </div>

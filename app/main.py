@@ -27,6 +27,9 @@ logger = logging.getLogger("uvicorn.error")
 # Allow frontend origins (local dev + Vercel). You can also set FRONTEND_ORIGIN env var to override.
 import os
 _frontend_origin = os.getenv('FRONTEND_ORIGIN')
+# Normalize FRONTEND_ORIGIN (ensure scheme) if user supplied just domain
+if _frontend_origin and not _frontend_origin.startswith('http'):
+    _frontend_origin = 'https://' + _frontend_origin.strip('/')
 _origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
 if _frontend_origin:
     _origins.append(_frontend_origin)
@@ -42,6 +45,11 @@ APP.add_middleware(
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Simple root endpoint so Render HEAD/GET / returns 200 instead of 404
+@APP.get("/")
+def root():
+    return {"service": "BreastAI backend", "status": "ok", "docs": "/health"}
 
 
 @APP.exception_handler(RequestValidationError)

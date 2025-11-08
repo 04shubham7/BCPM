@@ -24,9 +24,20 @@ APP = FastAPI(title="Breast Cancer Prediction API")
 logger = logging.getLogger("uvicorn.error")
 
 # Development CORS policy (open). Restrict this in production.
+# Allow frontend origins (local dev + Vercel). You can also set FRONTEND_ORIGIN env var to override.
+import os
+_frontend_origin = os.getenv('FRONTEND_ORIGIN')
+_origins = ["http://localhost:3000", "http://127.0.0.1:3000"]
+if _frontend_origin:
+    _origins.append(_frontend_origin)
+else:
+    # broad default for hosted preview URLs on Vercel (https)
+    _origins += ["https://*.vercel.app", "https://vercel.app"]
+
 APP.add_middleware(
     CORSMiddleware,
-    allow_origins=["http://localhost:3000", "http://127.0.0.1:3000", "http://localhost:8000", "*"],
+    allow_origins=_origins,
+    allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],

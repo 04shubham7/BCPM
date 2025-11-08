@@ -54,7 +54,8 @@ export default function Demo() {
   const openReport = async (parsedFeatures, mType, preOpenedWin = null) => {
     const reportWin = preOpenedWin || (typeof window !== 'undefined' ? window.open('', '_blank') : null)
     try {
-      const res = await fetch('/api/report', {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+  const res = await fetch(`${API_BASE}/report`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ features: parsedFeatures, model_type: mType })
@@ -101,7 +102,8 @@ export default function Demo() {
     // Pre-open a tab to avoid popup blockers when we later stream the PDF
     const preWin = typeof window !== 'undefined' ? window.open('', '_blank') : null
     try {
-      const res = await fetch('/api/predict', {
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+  const res = await fetch(`${API_BASE}/predict`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ features: parsed, model_type: modelType, explain })
@@ -157,7 +159,8 @@ export default function Demo() {
     setLoadingSample(true)
     setError('')
     try {
-  const res = await fetch('/api/sample')
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+  const res = await fetch(`${API_BASE}/sample`)
       if (!res.ok) {
         toast.error('Could not fetch sample')
         setLoadingSample(false)
@@ -181,7 +184,8 @@ export default function Demo() {
   useEffect(() => {
     const check = async () => {
       try {
-        const res = await fetch('/api/models')
+  const API_BASE = process.env.NEXT_PUBLIC_API_BASE || '';
+  const res = await fetch(`${API_BASE}/models`)
         if (!res.ok) return
         const j = await res.json()
         // Normalize to the frontend shape: { sklearn, dl, stacking, dl_file, dl_runtime }

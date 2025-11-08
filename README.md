@@ -21,6 +21,46 @@ Repository layout (top level)
 - `requirements.txt` — Python deps (ReportLab pinned for reliable PDFs)
 
 ## Quick start (Windows PowerShell)
+## Production deployment (Render + Vercel, no Docker)
+
+Backend (FastAPI) on Render:
+1. Commit `render.yaml` (included) or create a new Web Service manually.
+2. Settings:
+	- Runtime: Python
+	- Build Command: `pip install -r requirements.txt`
+	- Start Command: `uvicorn app.main:APP --host 0.0.0.0 --port $PORT`
+	- Health Check Path: `/health`
+	- Optional env: `FRONTEND_ORIGIN=https://your-frontend-url.vercel.app`
+3. Ensure model artifacts (`model_pipeline.joblib`, etc.) are in the repository (Render pulls them at build time).
+4. If enabling deep learning, add `tensorflow-cpu` to `requirements.txt` (Render Free plan has limited resources; prefer CPU variant).
+
+Frontend (Next.js) on Vercel:
+1. Add a project pointing at `frontend/`.
+2. Set an Environment Variable: `NEXT_PUBLIC_API_BASE=https://breastai-backend.onrender.com` (replace with your Render URL).
+3. Remove dev rewrites (or keep them—they are ignored on Vercel). All fetch calls now prepend `NEXT_PUBLIC_API_BASE`.
+4. For PDF links (awareness, report), the app uses this base to request backend endpoints.
+
+Cross-Origin / CORS:
+- `app/main.py` now reads `FRONTEND_ORIGIN` and also permits `https://*.vercel.app` domains via regex.
+- If you use a custom domain, set `FRONTEND_ORIGIN=https://yourdomain.com` in Render.
+
+File persistence notes:
+- Render’s disk is ephemeral between deploys; uploaded/generated runtime files (like per-request reports) remain during instance life but are lost after redeploy.
+- Long-term storage (if needed) can be added later (S3, etc.)—current design is stateless aside from bundled artifacts.
+
+Troubleshooting deployment:
+- 404 on PDFs: verify `NEXT_PUBLIC_API_BASE` is set and points to a live backend.
+- CORS error: set `FRONTEND_ORIGIN` exactly to your Vercel deployed URL.
+- Large dependency build timeout: remove unused heavy libs or pin versions; ensure ReportLab version remains pinned.
+
+Local env parity check:
+```powershell
+uvicorn app.main:APP --port 8000
+# In another terminal (frontend directory):
+npm run dev
+```
+Set `NEXT_PUBLIC_API_BASE=http://127.0.0.1:8000` for local Vercel preview parity.
+
 
 Backend API
 ```powershell

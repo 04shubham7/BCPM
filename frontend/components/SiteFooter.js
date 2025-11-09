@@ -7,7 +7,7 @@ export default function SiteFooter(){
       <div className="max-w-6xl mx-auto px-6 py-10 grid md:grid-cols-3 gap-8">
         <div>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-600 to-violet-600 text-white font-bold flex items-center justify-center shadow shadow-purple-900/40">BC</div>
+            <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-600 to-violet-600 text-white font-bold flex items-center justify-center shadow shadow-purple-900/40">SY</div>
             <span className="text-purple-100 font-semibold">Shyamati</span>
           </div>
           <p className="text-sm text-purple-300/70 leading-relaxed">

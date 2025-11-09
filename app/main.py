@@ -5,6 +5,7 @@ import joblib
 import numpy as np
 from pathlib import Path
 from fastapi.middleware.cors import CORSMiddleware
+from starlette.middleware.base import BaseHTTPMiddleware
 from fastapi.staticfiles import StaticFiles
 import json
 from fastapi.responses import StreamingResponse, JSONResponse
@@ -39,12 +40,46 @@ else:
 
 APP.add_middleware(
     CORSMiddleware,
+    # List of explicit origins (exact match). We include the dynamic FRONTEND_ORIGIN if provided.
     allow_origins=_origins,
+    # Regex allows any subdomain of vercel.app (e.g. https://bcpm.vercel.app)
     allow_origin_regex=r"https://.*\.vercel\.app",
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
 )
+
+# Extra defensive CORS layer: Some platforms (or custom proxies) may swallow the
+# Access-Control-Allow-Origin header when upstream returns certain error codes (e.g. 502/504).
+# This lightweight middleware mirrors back the Origin header for allowed domains even on error responses.
+class CORSMirrorMiddleware(BaseHTTPMiddleware):
+    async def dispatch(self, request, call_next):
+        response = await call_next(request)
+        origin = request.headers.get("origin")
+        try:
+            if origin:
+                allowed = False
+                if origin in _origins:
+                    allowed = True
+                elif origin.endswith(".vercel.app"):
+                    allowed = True
+                elif _frontend_origin and origin == _frontend_origin:
+                    allowed = True
+                if allowed:
+                    # Mirror origin to satisfy browsers; add Vary for caching correctness
+                    response.headers["Access-Control-Allow-Origin"] = origin
+                    response.headers["Vary"] = (response.headers.get("Vary", "") + ", Origin").strip(", ")
+                    response.headers["Access-Control-Allow-Credentials"] = "true"
+                    # Preflight support (if method == OPTIONS and CORS not already handled)
+                    if request.method == "OPTIONS":
+                        response.headers.setdefault("Access-Control-Allow-Headers", "*")
+                        response.headers.setdefault("Access-Control-Allow-Methods", "GET,POST,PUT,PATCH,DELETE,OPTIONS")
+        except Exception:
+            # Never fail the request because of CORS helper
+            pass
+        return response
+
+APP.add_middleware(CORSMirrorMiddleware)
 
 # Simple root endpoint so Render HEAD/GET / returns 200 instead of 404
 @APP.get("/")

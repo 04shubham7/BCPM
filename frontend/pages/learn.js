@@ -19,7 +19,7 @@ export default function Learn(){
       </Head>
 
       <header className="flex items-center justify-between px-8 py-6 bg-purple-900/20 backdrop-blur-md border-b border-purple-500/20">
-        <div className="flex items-center gap-4">
+        <Link href='/' className="flex items-center gap-4 no-underline">
           <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-purple-600 to-violet-600 flex items-center justify-center text-white font-bold shadow-lg shadow-purple-500/30">
             SY
           </div>
@@ -27,7 +27,7 @@ export default function Learn(){
             <div className="font-semibold text-lg text-purple-100">Shyamati</div>
             <div className="text-sm text-purple-300/70">Learn • Prevent • Act</div>
           </div>
-        </div>
+        </Link>
         <nav className="flex items-center gap-4">
           <Link href='/' className="text-purple-200 hover:text-purple-100 transition-colors">Home</Link>
           <Link href='/learn' className="text-purple-100 font-semibold">Getting Started</Link>

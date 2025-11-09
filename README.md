@@ -1,6 +1,6 @@
-# BreastAI — Breast Cancer Prediction and Awareness (FastAPI + Next.js)
+# Shyamati — Breast Cancer Prediction and Awareness (FastAPI + Next.js)
 
-BreastAI turns a Jupyter-style experiment into a reproducible pipeline, an API that streams plots and PDFs, and a modern dark-themed web app. It includes a “Getting Started” learning page, awareness PDFs (multi-language), and optional deep learning — all wired end-to-end.
+Shyamati turns a Jupyter-style experiment into a reproducible pipeline, an API that streams plots and PDFs, and a modern dark-themed web app. It includes a “Getting Started” learning page, awareness PDFs (multi-language), and optional deep learning — all wired end-to-end.
 
 Highlights
 - Reproducible training (scikit-learn) with stacked models and metadata export
@@ -36,7 +36,7 @@ Backend (FastAPI) on Render:
 
 Frontend (Next.js) on Vercel:
 1. Add a project pointing at `frontend/`.
-2. Set an Environment Variable: `NEXT_PUBLIC_API_BASE=https://breastai-backend.onrender.com` (replace with your Render URL).
+2. Set an Environment Variable: `NEXT_PUBLIC_API_BASE=https://shyamati-backend.onrender.com` (replace with your Render URL).
 3. Remove dev rewrites (or keep them—they are ignored on Vercel). All fetch calls now prepend `NEXT_PUBLIC_API_BASE`.
 4. For PDF links (awareness, report), the app uses this base to request backend endpoints.
 

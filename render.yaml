@@ -1,6 +1,6 @@
 services:
   - type: web
-    name: breastai-backend
+  name: shyamati-backend
     runtime: python
     region: oregon
     plan: free

@@ -8,7 +8,7 @@ export default function SiteFooter(){
         <div>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-purple-600 to-violet-600 text-white font-bold flex items-center justify-center shadow shadow-purple-900/40">BC</div>
-            <span className="text-purple-100 font-semibold">BreastAI</span>
+            <span className="text-purple-100 font-semibold">Shyamati</span>
           </div>
           <p className="text-sm text-purple-300/70 leading-relaxed">
             A modern demo that turns ML pipelines into explainable predictions with on-demand reports. For education only — not medical advice.
@@ -37,7 +37,7 @@ export default function SiteFooter(){
 
       <div className="border-t border-purple-500/10">
         <div className="max-w-6xl mx-auto px-6 py-5 flex flex-col sm:flex-row items-center justify-between gap-3">
-          <div className="text-xs text-purple-300/60">© {new Date().getFullYear()} BreastAI. Built with FastAPI · Next.js · scikit-learn · Optional TensorFlow</div>
+          <div className="text-xs text-purple-300/60">© {new Date().getFullYear()} Shyamati. Built with FastAPI · Next.js · scikit-learn · Optional TensorFlow</div>
           <div className="flex items-center gap-3 text-xs">
             <a className="text-purple-300 hover:text-purple-200" href="/">Home</a>
             <span className="text-purple-500/40">•</span>

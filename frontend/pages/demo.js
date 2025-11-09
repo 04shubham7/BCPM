@@ -214,7 +214,7 @@ export default function Demo() {
         <header className="flex flex-col md:flex-row items-start md:items-center justify-between mb-8 gap-4">
           <div>
             <h1 className="text-4xl md:text-5xl font-bold bg-gradient-to-r from-purple-300 via-violet-300 to-fuchsia-300 bg-clip-text text-transparent">
-              Breast Cancer Predictor
+              Shyamati — Breast Cancer Predictor
             </h1>
             <p className="text-sm text-purple-200/70 mt-2 flex items-center gap-2">
               <span className="w-2 h-2 bg-purple-400 rounded-full animate-pulse" />

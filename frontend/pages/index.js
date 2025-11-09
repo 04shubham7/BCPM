@@ -8,9 +8,9 @@ export default function Home(){
   const doShare = async () => {
     try {
       const shareUrl = typeof window !== 'undefined' ? window.location.href : 'http://localhost:3000'
-      if (navigator.share) {
+        if (navigator.share) {
         await navigator.share({
-          title: 'BreastAI — Learn the signs',
+          title: 'Shyamati — Learn the signs',
           text: 'Know the signs of breast cancer and spread awareness.',
           url: shareUrl,
         })
@@ -24,8 +24,8 @@ export default function Home(){
   return (
     <div className="min-h-screen">
       <Head>
-        <title>Breast Cancer Predictor — Demo</title>
-        <meta name="description" content="Explainable breast cancer prediction demo — FastAPI + Next.js" />
+        <title>Shyamati — Demo</title>
+        <meta name="description" content="Shyamati — explainable breast cancer prediction demo — FastAPI + Next.js" />
         <meta name="theme-color" content="#2d1b4e" />
       </Head>
 
@@ -35,7 +35,7 @@ export default function Home(){
             BC
           </div>
           <div>
-            <div className="font-semibold text-lg text-purple-100">BreastAI</div>
+            <div className="font-semibold text-lg text-purple-100">Shyamati</div>
             <div className="text-sm text-purple-300/70">Diagnosis demo & model studio</div>
           </div>
         </div>

@@ -680,7 +680,8 @@ if __name__ == '__main__':
             title_font = ImageFont.truetype("arial.ttf", 26)
         except Exception:
             title_font = ImageFont.load_default()
-        dr.text((30, 25), 'BreastAI Workflow', fill=(230,223,255), font=title_font)
+            
+        dr.text((30, 25), 'Shyamati Workflow', fill=(230,223,255), font=title_font)
         # Flow boxes
         rect(40, 250, 220, 80, 'Data & Training')
         rect(300, 250, 200, 80, 'Artifacts')

@@ -1,4 +1,4 @@
-# Project Documentation — BreastAI
+# Project Documentation — Shyamati
 
 This document captures the in-depth design for the training pipeline, API, frontend, and PDF/reporting system. It complements the high-level README.
 

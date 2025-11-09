@@ -84,7 +84,7 @@ APP.add_middleware(CORSMirrorMiddleware)
 # Simple root endpoint so Render HEAD/GET / returns 200 instead of 404
 @APP.get("/")
 def root():
-    return {"service": "BreastAI backend", "status": "ok", "docs": "/health"}
+    return {"service": "Shyamati backend", "status": "ok", "docs": "/health"}
 
 
 @APP.exception_handler(RequestValidationError)
@@ -932,7 +932,7 @@ def generate_pdf_report(features, feature_names, result, model_type: str):
             canvas_obj.setFont('Helvetica', 9)
             canvas_obj.setFillColor(colors.HexColor('#6b21a8'))
             # header
-            header_text = f"Breast Cancer Report - {safe_model}"
+            header_text = f"Shyamati — Breast Cancer Report - {safe_model}"
             canvas_obj.drawString(36, doc_obj.pagesize[1] - 36, header_text)
             # footer: page number and timestamp
             from datetime import datetime as _dt
@@ -1150,7 +1150,7 @@ def generate_pdf_report_bytes(features, feature_names, model_type: str):
             canvas_obj.saveState()
             canvas_obj.setFont('Helvetica', 9)
             canvas_obj.setFillColor(colors.HexColor('#6b21a8'))
-            header_text = f"Breast Cancer Report - {(model_type or 'sklearn')}"
+            header_text = f"Shyamati — Breast Cancer Report - {(model_type or 'sklearn')}"
             canvas_obj.drawString(36, doc_obj.pagesize[1] - 36, header_text)
             from datetime import datetime as _dt
             footer_text = f"{_dt.utcnow().strftime('%Y-%m-%d %H:%M UTC')} - Page {doc_obj.page}"
@@ -1415,7 +1415,7 @@ def generate_awareness_pdf_bytes(lang: str = 'en') -> bytes:
             canvas_obj.saveState()
             canvas_obj.setFont('Helvetica', 9)
             canvas_obj.setFillColor(colors.HexColor('#6b21a8'))
-            canvas_obj.drawString(36, doc_obj.pagesize[1]-30, 'Breast Cancer Awareness')
+            canvas_obj.drawString(36, doc_obj.pagesize[1]-30, 'Shyamati — Breast Cancer Awareness')
             canvas_obj.drawRightString(doc_obj.pagesize[0]-36, 24, f"Page {doc_obj.page}")
             canvas_obj.restoreState()
         except Exception:

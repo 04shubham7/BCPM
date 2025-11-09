@@ -24,7 +24,7 @@ export default function Learn(){
             BC
           </div>
           <div>
-            <div className="font-semibold text-lg text-purple-100">BreastAI</div>
+            <div className="font-semibold text-lg text-purple-100">Shyamati</div>
             <div className="text-sm text-purple-300/70">Learn • Prevent • Act</div>
           </div>
         </div>
